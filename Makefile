@@ -5,7 +5,11 @@ SERVER = server
 CLIENT = client
 CC = cc
 
-DIR_OBJ = obj/
+ifdef NAME
+	DIR_OBJ = obj/$(NAME)/
+else
+	DIR_OBJ = obj/
+endif
 SRC_DIR = src/
 INC_DIR = headers/
 LIBFT_DIR = libft/
@@ -13,11 +17,12 @@ LIBFT_LIB = libft/libft.a
 
 # Compiler and linker flags
 EXTRAFLAGS = -O3
-CFLAGS = -Wall -Wextra -Werror -MMD -mavx2 -I $(INC_DIR) -I $(LIBFT_DIR)headers -I minilibx-linux
+CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers -I minilibx-linux
 LIBS = -L$(LIBFT_DIR) -lft
 
 # Sources
-SRCS = main.c
+SRCS = main.c \
+		error.c
 
 # Object files and dependencies
 OBJS = $(patsubst %.c,$(DIR_OBJ)%.o,$(SRCS))
@@ -34,9 +39,15 @@ RESET  := \033[0m
 # Default rule
 .DEFAULT_GOAL = all
 
+.PHONY: clean_cmd
+clean_cmd:
+	@clear
+
 # Targets
 .PHONY: all
-all: check_git_submodules banner libft check_build $(SERVER) $(CLIENT)
+all: clean_cmd check_git_submodules banner libft check_build
+	@$(MAKE) -j$(shell nproc) --no-print-directory NAME=$(SERVER) $(SERVER)
+	@$(MAKE) -j$(shell nproc) --no-print-directory NAME=$(CLIENT) $(CLIENT)
 	@STATE=$$(cat $(STATE_FILE) 2>/dev/null || echo 0); \
 	if [ $$STATE -eq 1 ]; then \
 		echo -e "$(BLUE)[✓] Everything is up to date! No need to rebuild.$(RESET)"; \
@@ -48,10 +59,11 @@ all: check_git_submodules banner libft check_build $(SERVER) $(CLIENT)
 # Check if recompilation is needed
 .PHONY: check_build
 check_build:
-	@if ! find $(SRC_DIR) -type f -name '*.c' -newer $(SERVER) | grep -q . && \
+	@if [ -f $(SERVER) ] && [ -f $(CLIENT) ] && \
+		! find $(SRC_DIR) -type f -name '*.c' -newer $(SERVER) | grep -q . && \
 		! find $(INC_DIR) -type f -name '*.h' -newer $(SERVER) | grep -q . && \
 		! [ Makefile -nt $(SERVER) ] && \
-		! [ -z "$(wildcard $(OBJS))" ]; then \
+		! [ -z "$(wildcard $(OBJS)/$(SERVER))/" ]; then \
 		echo "1" > $(STATE_FILE); \
 	else \
 		echo -e "$(YELLOW)[Building MiniTalk]$(RESET)"; \
@@ -74,16 +86,16 @@ $(DIR_OBJ):
 	@mkdir -p $@
 
 $(DIR_OBJ)%.o: $(SRC_DIR)%.c Makefile | $(DIR_OBJ)
-	@echo -e "\t$(YELLOW)Compiling $*.c$(RESET)"
+	@echo -e "\t$(YELLOW)Compiling $(NAME) $*.c$(RESET)"
 	@$(CC) $(CFLAGS) $(EXTRAFLAGS) -c $< -o $@
 
 .PHONY: libft
 libft:
 	@$(MAKE) --no-print-directory -s -C $(LIBFT_DIR) $(LIBFTTARGET)
 
-$(CLIENT) $(SERVER): $(LIBFT_LIB) Makefile $(OBJS)
+$(NAME): $(LIBFT_LIB) Makefile $(OBJS)
 	@echo -e "$(BLUE)[Linking]$(RESET) $@"
-	$(CC) $(CFLAGS) $(EXTRAFLAGS) -D $(shell echo "$@" | tr '[:lower:]' '[:upper:]')=1 -o $@ $(filter %.o, $^) $(LIBS)
+	$(CC) $(CFLAGS) $(EXTRAFLAGS) -o $@ $(filter %.o, $^) $(LIBS)
 	@echo -e "$(GREEN)[✓] Successfully built: $@$(RESET)"
 
 .PHONY: clean
