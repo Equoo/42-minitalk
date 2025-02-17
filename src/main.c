@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:08:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/17 18:50:34 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/17 18:52:16 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ int	main(int argc, char **argv)
 					kill(ft_atoi(argv[1]), SIGUSR2);
 				else
 					kill(ft_atoi(argv[1]), SIGUSR1);
-				usleep(10000);
+				usleep(5000);
 				j++;
 			}
 			ft_printf("Sent to %d, %c, %i\n", ft_atoi(argv[1]), argv[2][i], argv[2][i]);
@@ -120,7 +120,7 @@ int	main(int argc, char **argv)
 		while (i < 8)
 		{
 			kill(ft_atoi(argv[1]), SIGUSR1);
-			usleep(10000);
+			usleep(5000);
 			i++;
 		}
 		ft_printf("Signal sent to %d\n", ft_atoi(argv[1]));
