@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:08:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/17 18:52:16 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/18 00:13:51 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@
 #include "main.h"
 #include "error.h"
 
-struct s_env
+typedef struct s_env
 {
-	int		fd;
-} typedef t_env;
+	int		fd; 
+} t_env;
 
 int	process_close(t_env *env)
 {
