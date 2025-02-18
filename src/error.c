@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 23:58:57 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/17 15:33:06 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/18 13:44:23 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ static char	*str_custom_errors(int err)
 		return ("Invalid arguments");
 	if (err == ERRINITVARS)
 		return ("No SERVER or CLIENT defined");
+	if (err == ERRINITNOSIG)
+		return ("Message timeout, no signal received from the server");
 	return ("Unknown error");
 }
 
