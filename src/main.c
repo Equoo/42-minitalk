@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:08:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/18 16:02:09 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/18 22:19:08 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,6 @@
 #include <ft_printf.h>
 #include "main.h"
 #include "error.h"
-
-typedef struct s_env
-{
-	int		fd; 
-} t_env;
 
 int	process_close(t_env *env)
 {
