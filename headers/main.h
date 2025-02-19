@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:22:25 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/17 15:25:43 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/19 11:59:51 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,13 @@
 # if CLIENT == 1 && SERVER == 1
 #  error "CLIENT and SERVER can't be defined at the same time"
 # endif
+
+typedef enum e_sigwait
+{
+	SIGWAITWRITE,
+	SIGWAITREAD,
+	SIGWAITRES,
+	SIGWAITRY
+} t_sigwait;
 
 #endif
