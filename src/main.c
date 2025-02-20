@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:08:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/18 22:19:08 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/19 19:34:43 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,24 @@
 #include "main.h"
 #include "error.h"
 
-int	process_close(t_env *env)
+int	process_close(void)
 {
-	(void)env;
 	if (errno != 11 && errno && print_error("Initialization"))
 		exit(EXIT_FAILURE);
 	exit(EXIT_SUCCESS);
 	return (EXIT_SUCCESS);
 }
 
+void	do_nothing2(int signum, siginfo_t *info, void *context)
+{
+	(void)signum;
+	ft_printf("Siginfo %d\n", info->si_pid);
+	(void)context;	
+}
+
 void	do_nothing(int signum)
 {
 	(void)signum;
-	//ft_printf("Back signal received %d\n", signum);	
 }
 
 void	block(void)
@@ -44,8 +49,8 @@ void	block(void)
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGUSR1);
 	sigaddset(&sigset, SIGUSR2);
-	act.sa_handler = do_nothing;
-	act.sa_flags = 0;
+	act.sa_sigaction = do_nothing2;
+	act.sa_flags = SA_SIGINFO;
 	act.sa_mask = sigset;
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
@@ -99,7 +104,7 @@ void	handle_signal(int signum)
 			bits = 0;
 			ft_printf("Client connected %d\n", client);
 		}
-		unblock();
+		//unblock();
 		return ;
 	}
 
@@ -128,7 +133,7 @@ void	handle_signal(int signum)
 		}
 		letter = 0;
 	}
-	unblock();
+	//unblock();
 	kill(client, SIGUSR2);
 }
 

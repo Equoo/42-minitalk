@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/19 17:29:24 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/19 22:50:40 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,20 @@
 #include "main.h"
 #include "error.h"
 
-volatile char	sigbit;
+volatile t_bool	sigbit[__INT_MAX__];
 
 void	sig_void(int sig)
 {
 	(void)sig;
 }
 
-void	sig_handler(int sig)
+void	sig_handler(int sig, siginfo_t *info, void *context)
 {
+	(void)context;
 	if (sig == SIGUSR1)
-		sigbit = 1;
+		sigbit[info->si_pid] = 1;
 	else if (sig == SIGUSR2)
-		sigbit = 0;
+		sigbit[info->si_pid] = 0;
 }
 
 void	sigblock(t_bool toggle)
@@ -64,8 +65,9 @@ void	sigblock(t_bool toggle)
 **	Signal handling
 */
 
-int		sigwait(t_bool ping)
+int		sigwait(t_sigwait ping)
 {
+	errno = 0;
 	if (ping != SIGWAITWRITE && ping != SIGWAITREAD)
 	{
 		if (!usleep(500000))
@@ -96,11 +98,13 @@ void	sigwritenbr(int pid, int bits, __int64_t n, t_sigwait ping)
 	i = 0;
 	while (i < bits)
 	{
+		sigblock(TRUE);
 		num = (n << i) & (1 << (bits - 1));
 		if (num)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
+		sigblock(FALSE);
 		waitres = sigwait(ping);
 		if (waitres == ERRINITNOFIRSTSIG)
 			waitres = sigwait(SIGWAITRY);
@@ -124,13 +128,19 @@ __int64_t	sigreadnbr(int pid, int bits, t_sigwait ping)
 			waitres = sigwait(SIGWAITRY);
 		if (waitres)
 			return ;
-		num = (n << i) & (1 << (bits - 1));
-		if (num)
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
+		sigblock(TRUE);
+		num = (num | sigbit) << 1;
+		if (pid)
+		{
+			if (num)
+				kill(pid, SIGUSR1);
+			else
+				kill(pid, SIGUSR2);
+		}
+		sigblock(FALSE);
 		i++;
 	}
+	return (num);
 }
 
 
@@ -140,15 +150,9 @@ __int64_t	sigreadnbr(int pid, int bits, t_sigwait ping)
 
 int		loop_server(void)
 {
-	int		i;
-
-	i = 0;
-	while (str[i])
-	{
-		sigwritenbr(pid, 8, str[i], ping);
-		i++;
-	}
-	sigwritenbr(pid, 8, '\0', ping);
+	if (usleep(100000) && errno != EINTR)
+		return (print_error("Sleep"));
+	if (errno == EINTR && )
 }
 
 int		init_server(void)
@@ -163,12 +167,22 @@ int		init_server(void)
 
 void	init_client(char **argv)
 {
+	int		i;
 	int		pid;
 
 	pid = ft_atoi(argv[1]);
 	if (pid < 1)
 		return (print_cerror("Usage", ERRINITPID));
 	ft_printf("Client PID: %d\n", getpid());	
+
+	i = 0;
+	sigwritenbr(pid, 64, ft_strlen(argv[2]), SIGWAITRES);
+	while (argv[2][i])
+	{
+		sigwritenbr(pid, 8, argv[2][i], SIGWAITRES);
+		i++;
+	}
+	sigwritenbr(pid, 8, '\0', SIGWAITRES);
 }
 
 int		main(int argc, char **argv)
