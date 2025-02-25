@@ -1,27 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.h                                            :+:      :+:    :+:   */
+/*   hash.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 13:54:37 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/19 11:39:22 by dderny           ###   ########.fr       */
+/*   Created: 2025/02/24 11:43:58 by dderny            #+#    #+#             */
+/*   Updated: 2025/02/24 11:51:16 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ERROR_H
-# define ERROR_H
+#include <stdint.h>
 
-# define INITERR_CATEGORY "Initialization"
-# define INITERROR 1000
-# define ERRINITARGS INITERROR + 1
-# define ERRINITVARS INITERROR + 2
-# define ERRINITNOSIG INITERROR + 3
-# define ERRINITPID INITERROR + 4
-# define ERRINITNOFIRSTSIG INITERROR + 5
+uint64_t hash(uint8_t *str)
+{
+	uint64_t hash = 5381UL;
 
-int	print_error(char *category);
-int	print_cerror(char *category, int error);
-
-#endif
+	while (*str++)
+		hash = ((hash << 5) + hash) + (int)*str;
+	return (hash);
+}

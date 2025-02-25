@@ -16,13 +16,17 @@ LIBFT_DIR = libft/
 LIBFT_LIB = libft/libft.a
 
 # Compiler and linker flags
-EXTRAFLAGS = -O3
+EXTRAFLAGS = -O2
 CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers -I minilibx-linux
 LIBS = -L$(LIBFT_DIR) -lft
 
 # Sources
 SRCS = main.c \
-		error.c
+		ft_error.c \
+		users.c \
+		hash.c \
+		signals.c \
+		sigreads.c \
 
 # Object files and dependencies
 OBJS = $(patsubst %.c,$(DIR_OBJ)%.o,$(SRCS))
