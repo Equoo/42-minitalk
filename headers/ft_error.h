@@ -6,21 +6,22 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 13:54:37 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/24 14:08:48 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 16:09:31 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ERROR_H
-# define ERROR_H
+#ifndef FT_ERROR_H
+# define FT_ERROR_H
 
 # define INITERR_CATEGORY "Initialization"
 # define INITERROR 1000
-# define ERRINITARGS INITERROR + 1
-# define ERRINITVARS INITERROR + 2
-# define ERRINITNOSIG INITERROR + 3
-# define ERRINITPID INITERROR + 4
-# define ERRINITNOFIRSTSIG INITERROR + 5
-# define ERRMESSAGELEN INITERROR + 6
+# define ERRINITARGS 1001
+# define ERRINITVARS 1002
+# define ERRINITNOSIG 1003
+# define ERRINITPID 1004
+# define ERRINITNOFIRSTSIG 1005
+# define ERRMESSAGELEN 1006
+# define ERRSERVERRETRY 1007
 
 int	print_error(char *category);
 int	print_cerror(char *category, int error);

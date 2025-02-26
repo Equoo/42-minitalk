@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 23:58:57 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/24 15:38:58 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 16:15:38 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	print_cerror(char *category, int error)
 		errorstr = str_custom_errors(error);
 	else
 		errorstr = ft_strerror(error);
-	ft_printf("Error\n%s: %s\n", category, errorstr);
+	ft_printf("%s: %s\n", category, errorstr);
 	return (error);
 }
 

@@ -4,6 +4,7 @@ STATE_FILE := .state.tmp
 SERVER = server
 CLIENT = client
 CC = cc
+NORMIGNORE = GLOBAL_VAR_DETECTED
 
 ifdef NAME
 	DIR_OBJ = obj/$(NAME)/
@@ -16,8 +17,8 @@ LIBFT_DIR = libft/
 LIBFT_LIB = libft/libft.a
 
 # Compiler and linker flags
-EXTRAFLAGS = -O2
-CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers -I minilibx-linux
+EXTRAFLAGS =
+CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers
 LIBS = -L$(LIBFT_DIR) -lft
 
 # Sources
@@ -26,7 +27,8 @@ SRCS = main.c \
 		users.c \
 		hash.c \
 		signals.c \
-		sigreads.c \
+		server.c \
+		client.c \
 
 # Object files and dependencies
 OBJS = $(patsubst %.c,$(DIR_OBJ)%.o,$(SRCS))
@@ -108,7 +110,7 @@ clean:
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
 	@rm -rf $(DIR_OBJ)
 	@rm -f $(STATE_FILE)
-	@rm -f .debug .bonus	
+	@rm -f .debug .bonus
 	@echo -e "$(GREEN)[✓] Cleaned all object files!$(RESET)"
 
 .PHONY: fclean
@@ -122,6 +124,9 @@ re: fclean all
 
 .PHONY: banner
 banner:
+	@echo -e "$(YELLOW)=====================================$(RESET)"
+	@echo -e "$(BLUE)             norminette            $(RESET)"
+	@norminette | grep -v -E "OK\!|$(NORMIGNORE)"; true
 	@echo -e "$(YELLOW)=====================================$(RESET)"
 #	@echo -e "$(BLUE)        🥵 Compiling Project         $(RESET)"
 

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 11:22:19 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/25 19:27:22 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 15:57:03 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 #  define USERS_MAX 16
 # endif
 
-typedef struct s_user {
+typedef struct s_user
+{
 	pid_t		pid;
 	t_bool		connected;
 	uint64_t	buffer;

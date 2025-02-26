@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 11:56:03 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/25 23:54:11 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 16:38:05 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <errno.h>
 
+#include "shared.h"
 #include "signals.h"
 #include "ft_error.h"
 
@@ -28,7 +29,7 @@ void	sig_action_void(int sig, siginfo_t *info, void *context)
 	(void)sig;
 }
 
-int		killandwait(pid_t pid, uint8_t sig)
+int	killandwait(pid_t pid, uint8_t sig)
 {
 	kill(pid, sig);
 	if (!usleep(500000))
@@ -42,9 +43,8 @@ int		killandwait(pid_t pid, uint8_t sig)
 	return (errno);
 }
 
-int		sigwritenbr(int pid, int bits, size_t n)
+int	sigwritenbr(int pid, int bits, size_t n)
 {
-	int			waitres;
 	size_t		num;
 	uint8_t		sig;
 	int			i;
@@ -58,16 +58,18 @@ int		sigwritenbr(int pid, int bits, size_t n)
 		if (num)
 			sig = SIGUSR2;
 		if (killandwait(pid, sig))
-			return (ERRINITNOSIG);
+			return (errno);
 		i++;
 	}
 	return (errno);
 }
 
-int		sigreadnbr(t_user *user, uint8_t bit, uint8_t bits, uint64_t *n)
+int	sigreadnbr(t_user *user, uint8_t bit, uint8_t bits, uint64_t *n)
 {
 	int		state;
 
+	if (!user->connected)
+		return (ERRINITPID);
 	user->buffer += bit;
 	if (user->rbytes == bits - 1)
 	{
@@ -91,10 +93,10 @@ int		sigreadnbr(t_user *user, uint8_t bit, uint8_t bits, uint64_t *n)
 	return (state);
 }
 
-int		toggle_signals(t_bool toggle)
+int	toggle_signals(t_bool toggle)
 {
-	struct sigaction act;
-	sigset_t sigset;
+	struct sigaction	act;
+	sigset_t			sigset;
 
 	act = (struct sigaction){0};
 	sigemptyset(&sigset);
@@ -102,7 +104,9 @@ int		toggle_signals(t_bool toggle)
 	sigaddset(&sigset, SIGUSR2);
 	if (!toggle)
 		act.sa_sigaction = sig_action_void;
-	else
+	else if (CLIENT)
+		act.sa_sigaction = client_sig_handler;
+	else if (SERVER)
 		act.sa_sigaction = server_sig_handler;
 	act.sa_flags = SA_SIGINFO;
 	act.sa_mask = sigset;

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/26 00:15:27 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 16:37:55 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,12 @@
 #include "ft_error.h"
 #include "main.h"
 
-static int	readhash(t_user *user, uint8_t bit)
+int	init_server(void)
 {
-	int		state;
-
-	state = sigreadnbr(user, bit, sizeof(uint64_t) * 8,
-						&user->hash);
-	if (state > 0)
-		return (state);
-	if (state == -1)
-		return (0);
-	return (0);
+	if (toggle_signals(TRUE))
+		return (EXIT_FAILURE);
+	ft_printf("Server PID: %d\n", getpid());
+	return (EXIT_SUCCESS);
 }
 
 static int	readlen(t_user *user, uint8_t bit)
@@ -65,16 +60,17 @@ static int	readchar(t_user *user, uint8_t bit)
 		return (state);
 	if (state == -1)
 		return (0);
-	user->msg[user->nbr] = (char)buffer;
+	if (user->msg)
+		user->msg[user->nbr] = (char)buffer;
 	user->nbr++;
 	buffer = 0;
 	return (0);
 }
- 
-void		readmessage(t_user *user, uint8_t bit)
+
+static void	readmessage(t_user *user, uint8_t bit)
 {
 	if (!user->hash)
-		readhash(user, bit);
+		sigreadnbr(user, bit, sizeof(uint64_t) * 8, &user->hash);
 	else if (!user->len)
 		readlen(user, bit);
 	else if (user->nbr < user->len - 1)
@@ -91,11 +87,37 @@ void		readmessage(t_user *user, uint8_t bit)
 	{
 		if (user->hash != hash((uint8_t *)user->msg))
 		{
-			ft_printf("Message from %d failed, retry...\n");
+			ft_printf("Message from %d failed, retry...\n", user->pid);
 			disconnect_user(user->pid, TRUE, TRUE);
 			return ;
 		}
 		ft_printf("Message from %d: %s\n", user->pid, user->msg);
 		disconnect_user(user->pid, FALSE, FALSE);
 	}
+}
+
+void	server_sig_handler(int sig, siginfo_t *info, void *context)
+{
+	t_user	*user;
+	uint8_t	bit;
+
+	errno = 0;
+	if (sig != SIGUSR1 && sig != SIGUSR2)
+		return ;
+	(void)context;
+	user = getuser(info->si_pid);
+	if (!user)
+		return ;
+	bit = 0;
+	if (sig == SIGUSR2)
+		bit = 1;
+	if (!user->connected && bit)
+	{
+		user->connected = TRUE;
+		kill(user->pid, SIGUSR2);
+		return ;
+	}
+	else if (!user->connected)
+		return ;
+	readmessage(user, bit);
 }

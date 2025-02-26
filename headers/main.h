@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:22:25 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/24 15:16:33 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/26 16:35:46 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,19 @@
 # define MAIN_H
 # include <stdint.h>
 
-# ifndef CLIENT
-#  define CLIENT 0
-# endif
-
-# ifndef SERVER
-#  define SERVER 0
-# endif
-
-# if CLIENT == 1 && SERVER == 1
-#  error "CLIENT and SERVER can't be defined at the same time"
-# endif
-
 # ifndef MSG_MAX
 #  define MSG_MAX 1000000
 # endif
 
-/* 
-** Timeout time in seconds
+/*
+** Timeout time in microseconds / 1000000 = seconds
 */
 # ifndef TIMEOUT_TIME
-#  define TIMEOUT_TIME 2
+#  define TIMEOUT_TIME 500000
 # endif
 
-uint64_t hash(uint8_t *str);
+uint64_t	hash(uint8_t *str);
+int			init_client(char **argv);
+int			init_server(void);
 
 #endif

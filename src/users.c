@@ -5,32 +5,34 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/24 11:21:54 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/25 19:27:03 by dderny           ###   ########.fr       */
+/*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
+/*   Updated: 2025/02/26 16:45:52 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "users.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-t_user	users[USERS_MAX] = {0};
+t_user	g_users[USERS_MAX] = {0};
 
 void	disconnect_user(pid_t pid, t_bool err, t_bool retry)
 {
 	int	i;
 
 	i = 0;
-	while (i < USERS_MAX && users[i].pid != pid)
+	while (i < USERS_MAX && g_users[i].pid != pid)
 		i++;
 	if (i == USERS_MAX)
 		return ;
-	if (users[i].msg && users[i].len)
-		free(users[i].msg);
-	users[i] = (t_user){0};
+	if (g_users[i].msg && g_users[i].len)
+		free(g_users[i].msg);
+	g_users[i] = (t_user){0};
 	if (err)
 	{
 		kill(pid, SIGUSR1);
+		usleep(5000);
 		if (retry)
 			kill(pid, SIGUSR2);
 		else
@@ -47,10 +49,14 @@ void	disconnect_all(t_bool err)
 	i = 0;
 	while (i < USERS_MAX)
 	{
-		if (users[i].connected)
-			disconnect_user(users[i].pid, err, FALSE);
+		if (g_users[i].connected)
+			disconnect_user(g_users[i].pid, err, FALSE);
 		i++;
 	}
+	if (err)
+		exit(EXIT_FAILURE);
+	else
+		exit(EXIT_SUCCESS);
 }
 
 t_user	*getuser(int pid)
@@ -60,17 +66,17 @@ t_user	*getuser(int pid)
 	if (pid < 1)
 		return (NULL);
 	i = 0;
-	while (i < USERS_MAX && users[i].pid != pid)
+	while (i < USERS_MAX && g_users[i].pid != pid)
 		i++;
 	if (i == USERS_MAX)
 	{
 		i = 0;
-		while (users[i].connected)
+		while (g_users[i].connected)
 			i++;
 		if (i == USERS_MAX)
 			return (NULL);
-		users[i] = (t_user){};
-		users[i].pid = pid;
+		g_users[i] = (t_user){};
+		g_users[i].pid = pid;
 	}
-	return (&users[i]);
+	return (&g_users[i]);
 }
