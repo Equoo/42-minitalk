@@ -6,11 +6,12 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/26 16:37:55 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/28 17:52:09 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <ft_printf.h>
@@ -70,7 +71,7 @@ static int	readchar(t_user *user, uint8_t bit)
 static void	readmessage(t_user *user, uint8_t bit)
 {
 	if (!user->hash)
-		sigreadnbr(user, bit, sizeof(uint64_t) * 8, &user->hash);
+		sigreadnbr(user, bit, sizeof(uint32_t) * 8, (uint64_t *)&user->hash);
 	else if (!user->len)
 		readlen(user, bit);
 	else if (user->nbr < user->len - 1)

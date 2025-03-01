@@ -17,7 +17,7 @@ LIBFT_DIR = libft/
 LIBFT_LIB = libft/libft.a
 
 # Compiler and linker flags
-EXTRAFLAGS =
+EXTRAFLAGS = -O3
 CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers
 LIBS = -L$(LIBFT_DIR) -lft
 
@@ -52,8 +52,8 @@ clean_cmd:
 # Targets
 .PHONY: all
 all: clean_cmd check_git_submodules banner libft check_build
-	@$(MAKE) -j$(shell nproc) --no-print-directory NAME=$(SERVER) $(SERVER)
-	@$(MAKE) -j$(shell nproc) --no-print-directory NAME=$(CLIENT) $(CLIENT)
+	@$(MAKE) -j$(shell nproc) --no-print-directory EXTRAFLAGS="$(EXTRAFLAGS)" NAME=$(SERVER) $(SERVER)
+	@$(MAKE) -j$(shell nproc) --no-print-directory EXTRAFLAGS="$(EXTRAFLAGS)" NAME=$(CLIENT) $(CLIENT)
 	@STATE=$$(cat $(STATE_FILE) 2>/dev/null || echo 0); \
 	if [ $$STATE -eq 1 ]; then \
 		echo -e "$(BLUE)[✓] Everything is up to date! No need to rebuild.$(RESET)"; \
@@ -128,7 +128,6 @@ banner:
 	@echo -e "$(BLUE)             norminette            $(RESET)"
 	@norminette | grep -v -E "OK\!|$(NORMIGNORE)"; true
 	@echo -e "$(YELLOW)=====================================$(RESET)"
-#	@echo -e "$(BLUE)        🥵 Compiling Project         $(RESET)"
 
 # Git Submodule Check
 .PHONY: check_git_submodules

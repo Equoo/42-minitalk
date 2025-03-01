@@ -6,15 +6,15 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 11:43:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/26 15:08:56 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/28 17:47:34 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdint.h>
 
-uint64_t	hash(uint8_t *str)
+uint32_t	hash(uint8_t *str)
 {
-	uint64_t	hash;
+	uint32_t	hash;
 
 	hash = 5381;
 	while (*str++)

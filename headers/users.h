@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 11:22:19 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/26 15:57:03 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/28 17:48:44 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ typedef struct s_user
 	uint64_t	nbr;
 	uint8_t		rbytes;
 	size_t		len;
-	uint64_t	hash;
+	uint32_t	hash;
 	char		*msg;
 }		t_user;
 

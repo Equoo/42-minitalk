@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 11:56:03 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/26 16:38:05 by dderny           ###   ########.fr       */
+/*   Updated: 2025/02/28 17:31:28 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	sigwritenbr(int pid, int bits, size_t n)
 	i = 0;
 	while (i < bits)
 	{
-		usleep(50 * LAG_FACTOR);
+		usleep(25 * LAG_FACTOR);
 		num = n & (1ul << (bits - 1 - i));
 		sig = SIGUSR1;
 		if (num)
@@ -84,7 +84,7 @@ int	sigreadnbr(t_user *user, uint8_t bit, uint8_t bits, uint64_t *n)
 		user->rbytes++;
 		state = -1;
 	}
-	if (usleep(50 * LAG_FACTOR) && errno != EINTR)
+	if (usleep(25 * LAG_FACTOR) && errno != EINTR)
 		return (errno);
 	if (errno == EINTR)
 		errno = 0;
