@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/02/28 17:51:36 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/01 16:51:59 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 int g_test = 1;
 
-static int	writemessage(pid_t pid, char *message)
+/*static int	writemessage(pid_t pid, char *message)
 {
 	static char	*msg;
 	int			i;
@@ -51,7 +51,7 @@ static int	writemessage(pid_t pid, char *message)
 	}
 	usleep(2500);
 	return (errno);
-}
+}*/
 
 void	client_sig_handler(int sig, siginfo_t *info, void *context)
 {
@@ -89,9 +89,38 @@ int	init_client(char **argv)
 	if (toggle_signals(TRUE))
 		return (EXIT_FAILURE);
 	ft_printf("Client PID: %d\n", getpid());
-	while (g_test == 1)
+	/*while (g_test == 1)
 		writemessage(pid, argv[2]);
 	if (errno)
-		return (EXIT_FAILURE);
+		return (EXIT_FAILURE);*/
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
+	usleep(50);
+	kill(pid, SIGUSR1);
 	return (EXIT_SUCCESS);
 }
