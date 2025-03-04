@@ -1,33 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.h                                             :+:      :+:    :+:   */
+/*   uint32.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/17 15:22:25 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/01 17:28:10 by dderny           ###   ########.fr       */
+/*   Created: 2025/03/04 15:31:16 by dderny            #+#    #+#             */
+/*   Updated: 2025/03/04 15:31:32 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_H
-# define MAIN_H
-# include <stdint.h>
+#include "packet.h"
 
-// 32 bit maximum
-# ifndef MSG_MAX
-#  define MSG_MAX 4294967296
-# endif
+uint8_t	net_write_uint32(t_user *user, const uint32_t nbr)
+{
+	uint8_t		*data;
+	t_packet	*packet;
 
-/*
-** Timeout time in microseconds / 1000000 = seconds
-*/
-# ifndef TIMEOUT_TIME
-#  define TIMEOUT_TIME 500000
-# endif
-
-uint32_t	hash(uint8_t *str);
-int			init_client(char **argv);
-int			init_server(void);
-
-#endif
+	packet = &user->packet;
+	if (packet->cursor + sizeof(uint32_t) > PACKET_SIZE)
+		return (1);
+	data = packet->data + sizeof(uint32_t);
+	*(uint32_t *)(data + packet->cursor / sizeof(uint8_t)) = nbr;
+	packet->cursor += sizeof(uint32_t);
+	return (0);
+}

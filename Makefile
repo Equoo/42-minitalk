@@ -23,10 +23,13 @@ LIBS = -L$(LIBFT_DIR) -lft
 
 # Sources
 SRCS = main.c \
+		packet/packet.c \
+		packet/core.c \
+		packet/string.c \
+		packet/uint32.c \
+		packet/users.c \
+		packet/hash.c \
 		ft_error.c \
-		users.c \
-		hash.c \
-		signals.c \
 		server.c \
 		client.c \
 

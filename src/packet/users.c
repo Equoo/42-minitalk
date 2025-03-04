@@ -6,16 +6,38 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/03 15:17:15 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/04 16:45:12 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "users.h"
+#include "ft_error.h"
+#include "packet.h"
+
+#include <ft_printf.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 t_user	g_users[USERS_MAX] = {0};
+
+t_user	*connectto(pid_t pid)
+{
+	t_user	*user;
+
+	user = getuser(pid);
+	if (!user)
+	{
+		print_cerror(ERRUSER, ERRUSER_MAX);
+		return (NULL);
+	}
+	if (user->connected)
+	{
+		ft_printf("User %d already connected\n", pid);
+		return (NULL);
+	}
+	kill(pid, SIGUSR2);
+	return (user);
+}
 
 void	disconnect_user(pid_t pid, t_bool err, t_bool retry)
 {

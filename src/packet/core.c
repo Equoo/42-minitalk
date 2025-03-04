@@ -1,39 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   packet.c                                           :+:      :+:    :+:   */
+/*   core.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/03 16:13:05 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/03 19:04:41 by dderny           ###   ########.fr       */
+/*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
+/*   Updated: 2025/03/04 18:18:19 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "packet.h"
-#include "ft_bool.h"
 #include "ft_error.h"
-#include "users.h"
-#include <stdatomic.h>
-#include <stddef.h>
+
+#include <signal.h>
 #include <stdint.h>
-#include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <libft.h>
 #include <ft_printf.h>
-
-void	net_connection_timeout(void)
-{
-	ft_printf("Connection timeout\n");
-}
 
 static void	process_packet(t_user *user, uint8_t bit)
 {
 	t_packet	*packet;
-	uint8_t		rbytes;
 
 	packet = &user->packet;
+	if (user->state != USER_RECEIVING)
+	{
+		user->state = USER_RECEIVING;
+		packet->error = !bit;
+		kill(user->pid, SIGUSR2);
+		return ;
+	}
 	if (packet->cursor < PACKET_SIZE + sizeof(uint32_t))
 	{
 		packet->data[packet->cursor / sizeof(uint8_t)] = bit;
@@ -47,12 +44,38 @@ static void	process_packet(t_user *user, uint8_t bit)
 	if (packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
 		ft_printf("Packet from %d failed, retry...\n", user->pid);
-		net_send_error(user->pid, ERRPACKETS_DIFFER);
+		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
 	}
 	ft_printf("Packet from %d: %s\n", user->pid, packet->data + sizeof(uint32_t));
-	net_receive_packet(user->pid, packet->data + sizeof(uint32_t));
-	*packet = (t_packet){0}; 
+	user->state = USER_NONE;
+	net_receive_packet(user, packet->data + sizeof(uint32_t));
+	*packet = (t_packet){0};
+}
+
+static void	send_coroutine(t_user *user, uint8_t bit)
+{
+	t_packet	*packet;
+	uint8_t		wbytes;
+	uint32_t	pos;
+
+	packet = &user->packet;
+	if (!packet->hash || !bit)
+		return ;
+	if (packet->cursor >= PACKET_SIZE + sizeof(uint32_t))
+	{
+		user->state = USER_NONE;
+		user->packet = (t_packet){0};
+		return ;
+	}
+	pos = packet->cursor / sizeof(uint8_t);
+	wbytes = packet->cursor % sizeof(uint8_t);
+	bit = (packet->data[pos] << wbytes) & 0x80;
+	if (bit)
+		kill(user->pid, SIGUSR2);
+	else
+		kill(user->pid, SIGUSR1);
+	packet->cursor++;
 }
 
 void	packet_sig_handler(int sig, siginfo_t *info, void *context)
@@ -61,7 +84,7 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	uint8_t	bit;
 
 	errno = 0;
-	if (sig != SIGUSR1 && sig != SIGUSR2)
+	if (sig != SIGUSR1 && sig != SIGUSR2 && context)
 		return ;
 	user = getuser(info->si_pid);
 	if (!user)
@@ -70,11 +93,18 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	if (!user->connected && bit)
 	{
 		user->connected = TRUE;
+		net_user_connected(user);
 		kill(user->pid, SIGUSR2);
 		return ;
 	}
 	if (user->connected)
-		process_packet(user, bit);
+	{
+		if (user->state == USER_WRITING)
+			send_coroutine(user, bit);
+		else
+			process_packet(user, bit);
+	}
+	net_hook_loop(user);
 }
 
 uint8_t	net_init(void)
@@ -104,65 +134,9 @@ void	net_loop(void)
 	{
 		elapsed = sleep(2);
 		if (!elapsed)
+		{
+			net_hook_loop(NULL);
 			net_connection_timeout();
-		
+		}
 	}
-}
-
-t_packet	*net_new_packet(t_user *user, t_bool error)
-{
-	t_packet	packet;
-
-	user->state = USER_RECEIVING;
-	user->packet = (t_packet){0};
-	user->packet.error = error;
-	return (&user->packet);
-}
-
-const char	*net_write_string(t_packet *packet, const char *str)
-{
-	const size_t	size_left = (PACKET_SIZE - packet->cursor) / sizeof(uint8_t);
-	uint8_t			*data;
-	size_t			len;
-	
-	data = packet->data + sizeof(uint32_t);
-	len = ft_strlen(str);
-	if (len > size_left)
-	{
-		memcpy(data, str, size_left);
-		packet->cursor += sizeof(uint8_t) * size_left;
-		return (str + size_left);
-	}
-	else
-	{
-		memcpy(data, str, len);
-		packet->cursor += sizeof(uint8_t) * len;
-		return (NULL);
-	}
-	return (NULL);
-}
-
-uint8_t	net_write_uint32(t_packet *packet, const uint32_t nbr)
-{
-	uint8_t	*data;
-
-	if (packet->cursor + sizeof(uint32_t) > PACKET_SIZE)
-		return (1);
-	data = packet->data + sizeof(uint32_t);
-	*(uint32_t *)(data + packet->cursor / sizeof(uint8_t)) = nbr;
-	packet->cursor += sizeof(uint32_t);
-	return (0);
-}
-
-int	net_send_packet(int pid, t_packet *packet)
-{
-	if (!packet->hash)
-	{	
-		packet->hash = hash(packet->data + sizeof(uint32_t));
-		*(uint32_t *)packet->data = packet->hash;
-		packet->cursor = 0;
-	}
-	if (kill(pid, SIGUSR1))
-		return (errno);
-	return (0);
 }
