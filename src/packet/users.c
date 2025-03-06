@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 16:45:12 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/05 14:19:50 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,8 @@ void	disconnect_all(t_bool err)
 	}
 	if (err)
 		exit(EXIT_FAILURE);
-	else
-		exit(EXIT_SUCCESS);
+	//else
+		//exit(EXIT_SUCCESS);
 }
 
 t_user	*getuser(int pid)

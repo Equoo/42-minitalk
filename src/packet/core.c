@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 18:18:19 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/06 14:55:37 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <signal.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
 #include <ft_printf.h>
@@ -27,50 +28,61 @@ static void	process_packet(t_user *user, uint8_t bit)
 	if (user->state != USER_RECEIVING)
 	{
 		user->state = USER_RECEIVING;
+		user->packet = (t_packet){0};
 		packet->error = !bit;
+		ft_printf("\tInit receiving\n");
 		kill(user->pid, SIGUSR2);
 		return ;
 	}
-	if (packet->cursor < PACKET_SIZE + sizeof(uint32_t))
+	if ((!packet->error && packet->cursor < PACKET_SIZE + sizeof(uint32_t) * 8)
+			|| (packet->error && packet->cursor < sizeof(uint32_t) * 8))
 	{
-		packet->data[packet->cursor / sizeof(uint8_t)] = bit;
-		if (packet->cursor % sizeof(uint8_t) < sizeof(uint8_t) - 1)
-			packet->data[packet->cursor / sizeof(uint8_t)] <<= 1;
+		packet->data[packet->cursor / 8] <<= 1;
+		packet->data[packet->cursor / 8] += bit;
+		ft_printf("\tAdd to data, cursor: %u, %u; %c, %x\n", packet->cursor, packet->cursor % 8, packet->data[packet->cursor / 8], packet->data[packet->cursor / 8]);
 		packet->cursor++;
 		kill(user->pid, SIGUSR2);
 		return ;
 	}
 	packet->hash = *(uint32_t *)packet->data;
-	if (packet->hash != hash(packet->data + sizeof(uint32_t)))
+	if (!packet->error && packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
-		ft_printf("Packet from %d failed, retry...\n", user->pid);
+		ft_printf("Packet from %d failed, retry... (%x, %x) (%u %s)\n", user->pid, packet->hash, hash(packet->data + sizeof(uint32_t)), *(uint32_t *)(packet->data + sizeof(uint32_t)), packet->data + sizeof(uint32_t) * 2);
 		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
 	}
 	ft_printf("Packet from %d: %s\n", user->pid, packet->data + sizeof(uint32_t));
 	user->state = USER_NONE;
-	net_receive_packet(user, packet->data + sizeof(uint32_t));
-	*packet = (t_packet){0};
+	if (packet->error)
+		net_receive_error(user, packet->hash);
+	else
+		net_receive_packet(user, packet->data + sizeof(uint32_t));
+	user->lastpacket = *packet;
+	user->packet = (t_packet){0};
 }
 
 static void	send_coroutine(t_user *user, uint8_t bit)
 {
 	t_packet	*packet;
-	uint8_t		wbytes;
+	uint32_t	wbytes;
 	uint32_t	pos;
 
 	packet = &user->packet;
 	if (!packet->hash || !bit)
 		return ;
-	if (packet->cursor >= PACKET_SIZE + sizeof(uint32_t))
+	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
+		|| (packet->error && packet->cursor >= sizeof(uint32_t) * 8))
 	{
+		ft_printf("Sended packet to %d: %x, len %u for %s\n", user->pid, packet->hash, ((uint32_t *)packet->data)[1], packet->data + sizeof(uint32_t));
 		user->state = USER_NONE;
+		user->lastpacket = user->packet;
 		user->packet = (t_packet){0};
 		return ;
 	}
-	pos = packet->cursor / sizeof(uint8_t);
-	wbytes = packet->cursor % sizeof(uint8_t);
-	bit = (packet->data[pos] << wbytes) & 0x80;
+	pos = packet->cursor / 8;
+	wbytes = packet->cursor % 8;
+	bit = (packet->data[pos] << wbytes) & (uint8_t)0x80;
+	ft_printf("Send %c, %x bit %d to %d\n", packet->data[pos], packet->data[pos], bit, user->pid);
 	if (bit)
 		kill(user->pid, SIGUSR2);
 	else
@@ -90,6 +102,7 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	if (!user)
 		return ;
 	bit = (sig == SIGUSR2);
+	usleep(5000);
 	if (!user->connected && bit)
 	{
 		user->connected = TRUE;
@@ -99,7 +112,9 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	}
 	if (user->connected)
 	{
-		if (user->state == USER_WRITING)
+		ft_printf("Process %d, STATE %d, BIT %d, CURSOR OCTECT %d\n", user->pid, user->state, bit, user->packet.cursor / 8);
+
+		if (user->state == USER_WRITING && bit)
 			send_coroutine(user, bit);
 		else
 			process_packet(user, bit);

@@ -83,19 +83,20 @@ check_build:
 debug: EXTRAFLAGS = -O0 -g3 -DDEBUG=1
 debug: DEBUG = 1
 debug: all
-	touch .debug
+	touch .d
 
 .PHONY: bonus
 bonus: SRCS = $(SRCS_BONUS)
 bonus: BONUS = 1
 bonus: all
-	touch .bonus
+	touch .b
 
-$(DIR_OBJ):
+%/:
 	@mkdir -p $@
 
-$(DIR_OBJ)%.o: $(SRC_DIR)%.c Makefile | $(DIR_OBJ)
+$(DIR_OBJ)%.o: $(SRC_DIR)%.c Makefile
 	@echo -e "\t$(YELLOW)Compiling $(NAME) $*.c$(RESET)"
+	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(EXTRAFLAGS) -c $< -o $@
 
 .PHONY: libft
@@ -113,7 +114,7 @@ clean:
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
 	@rm -rf $(DIR_OBJ)
 	@rm -f $(STATE_FILE)
-	@rm -f .debug .bonus
+	@rm -f .d .b
 	@echo -e "$(GREEN)[✓] Cleaned all object files!$(RESET)"
 
 .PHONY: fclean

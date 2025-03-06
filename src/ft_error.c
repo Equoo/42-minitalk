@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 23:58:57 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 16:29:12 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/05 14:11:52 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@ static char	*str_custom_errors(int err)
 		return ("./client [PID] [message]");
 	if (err == ERRINITPID)
 		return ("Invalid PID");
-	if (err == ERRINITVARS)
-		return ("No SERVER or CLIENT defined");
-	if (err == ERRINITNOSIG)
-		return ("Message timeout, no signal received from the server");
-	if (err == ERRMESSAGELEN)
+	//if (err == ERRINITVARS)
+		//return ("No SERVER or CLIENT defined");
+	//if (err == ERRINITNOSIG)
+		//return ("Message timeout, no signal received from the server");
+	if (err == ERRINITLEN)
 		return ("Message length is invalid");
 	if (err == ERRUSER_MAX)
 		return ("Too many connected");

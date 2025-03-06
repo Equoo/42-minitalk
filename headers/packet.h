@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 16:42:59 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/06 13:26:35 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,11 @@
 #  define USERS_MAX 16
 # endif
 
+/*
+** 128 chars = 1024 bits
+*/
 # ifndef PACKET_SIZE
-#  define PACKET_SIZE 256
+#  define PACKET_SIZE 1024
 # endif
 
 typedef enum e_user_state {
@@ -35,7 +38,7 @@ typedef  struct	s_packet
 {
 	t_bool		error;
 	uint32_t	hash;
-	uint8_t		data[PACKET_SIZE + sizeof(uint32_t)];
+	uint8_t		data[PACKET_SIZE / 8 + sizeof(uint32_t)];
 	uint32_t	cursor;
 }				t_packet;
 
@@ -46,6 +49,7 @@ typedef struct s_user
 	t_user_state	state;
 	char			*msg;
 	size_t			len;
+	t_packet		lastpacket;
 	t_packet		packet;
 }		t_user;
 
@@ -65,11 +69,12 @@ uint8_t		net_write_uint32(t_user *user, const uint32_t nbr);
 const char	*net_read_string(t_user *user);
 uint32_t	net_read_uint32(t_user *user);
 
-int			net_send_error(t_user *user, int error);
+uint8_t		net_send_error(t_user *user, const uint32_t error);
 uint8_t		net_send_packet(t_user *user);
 
 void		net_hook_loop(t_user *user);
 void		net_user_connected(t_user *user);
+void		net_receive_error(t_user *user, const uint32_t error);
 void		net_receive_packet(t_user *user, const uint8_t *data);
 void		net_connection_timeout(void);
 

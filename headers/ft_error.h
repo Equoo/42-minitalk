@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 13:54:37 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 16:28:50 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/05 13:19:19 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define ERRINIT "Initialization"
 # define ERRINITUSAGE 1000
 # define ERRINITPID 1001
+# define ERRINITLEN 1002
 
 # define ERRUSER "Users"
 # define ERRUSER_MAX 1100
