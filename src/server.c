@@ -6,17 +6,16 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/06 11:35:25 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:43:36 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <ft_printf.h>
-#include <unistd.h>
-
+#include "ft_error.h"
 #include "libft.h"
 #include "packet.h"
-#include "ft_error.h"
+#include <ft_printf.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int	init_server(void)
 {
@@ -29,6 +28,7 @@ int	init_server(void)
 void	net_user_connected(t_user *user)
 {
 	(void)user;
+	ft_printf("User connected, %d\n", user->pid);
 }
 
 void	net_hook_loop(t_user *user)
@@ -36,31 +36,31 @@ void	net_hook_loop(t_user *user)
 	(void)user;
 }
 
-void		net_receive_packet(t_user *user, const uint8_t *data)
+void	net_receive_packet(t_user *user, const uint8_t *data)
 {
 	char	*str;
-	size_t 	curlen;
+	size_t	strlen;
+	size_t	curlen;
 
 	if (!user->msg)
 	{
 		user->len = *(uint32_t *)data;
-		user->msg = (char *)malloc(sizeof(char) * (user->len + 1));
-		user->msg[user->len] = 0;
+		user->msg = (char *)ft_calloc(user->len + 1, sizeof(char));
 		str = (char *)data + sizeof(uint32_t);
 	}
 	else
 		str = (char *)data;
+	strlen = ft_strlen(str);
 	curlen = ft_strlen(user->msg);
-	if (curlen + ft_strlen(str) <= user->len)
+	if (curlen + strlen <= user->len)
 		ft_memcpy(user->msg + curlen, str, ft_strlen(str));
-	if (curlen == user->len)
+	if (curlen + strlen == user->len)
 	{
 		ft_printf("Message from %d: %s\n", user->pid, user->msg);
 		free(user->msg);
 		user->msg = NULL;
-		disconnect_user(user->pid, FALSE, FALSE);
+		user_disconnect(user->pid, FALSE, FALSE);
 	}
 }
 
 #endif
-

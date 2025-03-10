@@ -6,19 +6,18 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/06 13:24:38 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:43:42 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "packet.h"
-#include "minitalk.h"
 #include "ft_error.h"
-
+#include "minitalk.h"
+#include "packet.h"
+#include <ft_printf.h>
+#include <libft.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libft.h>
-#include <ft_printf.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -33,7 +32,7 @@ int	init_client(char **argv)
 	if (ft_strlen(argv[2]) > MSG_MAX)
 		return (print_cerror("Message", ERRINITLEN));
 	ft_printf("Client PID: %d\n", getpid());
-	server = connectto(pid);
+	server = user_connect(pid);
 	if (!server)
 		return (print_cerror("Initialization", ERRINITPID));
 	server->msg = argv[2];
@@ -47,7 +46,7 @@ void	net_user_connected(t_user *user)
 	printf("Connected to %d, %s\n", user->pid, user->msg);
 	if (!user->msg)
 	{
-		disconnect_user(user->pid, TRUE, FALSE);
+		user_disconnect(user->pid, TRUE, FALSE);
 		return ;
 	}
 	net_new_packet(user, FALSE);
@@ -60,26 +59,25 @@ void	net_hook_loop(t_user *user)
 {
 	if (!user || !user->msg || !*user->msg)
 		return ;
-	printf("Hook loop %d, %d, %s\n", user->pid, user->state, user->msg);
 	if (user->state == USER_NONE)
 	{
+		printf("Send next %d\n", user->pid);
 		net_new_packet(user, FALSE);
 		user->msg = (char *)net_write_string(user, user->msg);
 		net_send_packet(user);
 	}
-	else
-	{
-		disconnect_all(FALSE);
-		exit(EXIT_SUCCESS);
-	}
+	// else
+	//{
+	// disconnect_all(FALSE);
+	// exit(EXIT_SUCCESS);
+	//}
 }
 
-void		net_receive_packet(t_user *user, const uint8_t *data)
+void	net_receive_packet(t_user *user, const uint8_t *data)
 {
 	printf("Receive packet %d, %s\n", user->pid, data);
-
 	(void)data;
-	disconnect_user(user->pid, FALSE, FALSE);
+	user_disconnect(user->pid, FALSE, FALSE);
 }
 
 #endif

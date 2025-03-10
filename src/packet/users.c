@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/05 14:19:50 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:14:30 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 t_user	g_users[USERS_MAX] = {0};
 
-t_user	*connectto(pid_t pid)
+t_user	*user_connect(pid_t pid)
 {
 	t_user	*user;
 
@@ -30,16 +30,17 @@ t_user	*connectto(pid_t pid)
 		print_cerror(ERRUSER, ERRUSER_MAX);
 		return (NULL);
 	}
-	if (user->connected)
+	if (user->state >= USER_CONNECTED)
 	{
 		ft_printf("User %d already connected\n", pid);
 		return (NULL);
 	}
+	user->state = USER_CONNECTING;
 	kill(pid, SIGUSR2);
 	return (user);
 }
 
-void	disconnect_user(pid_t pid, t_bool err, t_bool retry)
+void	user_disconnect(pid_t pid, t_bool err, t_bool retry)
 {
 	int	i;
 
@@ -68,15 +69,15 @@ void	disconnect_user(pid_t pid, t_bool err, t_bool retry)
 	}
 }
 
-void	disconnect_all(t_bool err)
+void	user_kickall(t_bool err)
 {
 	int	i;
 
 	i = 0;
 	while (i < USERS_MAX)
 	{
-		if (g_users[i].connected)
-			disconnect_user(g_users[i].pid, err, FALSE);
+		if (g_users[i].state >= USER_CONNECTED)
+			user_disconnect(g_users[i].pid, err, FALSE);
 		i++;
 	}
 	if (err)
@@ -97,7 +98,7 @@ t_user	*getuser(int pid)
 	if (i == USERS_MAX)
 	{
 		i = 0;
-		while (g_users[i].connected)
+		while (g_users[i].state >= USER_CONNECTED)
 			i++;
 		if (i == USERS_MAX)
 			return (NULL);
@@ -105,4 +106,18 @@ t_user	*getuser(int pid)
 		g_users[i].pid = pid;
 	}
 	return (&g_users[i]);
+}
+
+
+void	foruser(void (f)(t_user *user))
+{
+	int	i;
+
+	i = 0;
+	while (i < USERS_MAX)
+	{
+		if (g_users[i].state >= USER_CONNECTED)
+			f(&g_users[i]);
+		i++;
+	}
 }

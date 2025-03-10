@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:13:05 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/06 13:21:39 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 14:43:35 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ uint8_t	net_send_error(t_user *user, const uint32_t error)
 	return (0);
 }
 
-uint8_t	net_send_packet(t_user *user)
+uint8_t	 net_send_packet(t_user *user)
 {
 	t_packet	*packet;
 

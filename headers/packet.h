@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/06 13:26:35 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:21:30 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,10 @@
 
 typedef enum e_user_state {
 	USER_NONE,
+	USER_CONNECTING,
+	USER_CONNECTED,
 	USER_RECEIVING,
-	USER_WRITING
+	USER_WRITING,
 }	t_user_state;
 
 typedef  struct	s_packet
@@ -45,33 +47,51 @@ typedef  struct	s_packet
 typedef struct s_user
 {
 	pid_t			pid;
-	t_bool			connected;
+	int8_t			bit;
+	int8_t			sbit;
 	t_user_state	state;
-	char			*msg;
-	size_t			len;
 	t_packet		lastpacket;
 	t_packet		packet;
+
+	char			*msg;
+	size_t			len;
 }		t_user;
 
-uint32_t	hash(uint8_t *str);
-
-void		disconnect_user(int pid, t_bool err, t_bool retry);
-void		disconnect_all(t_bool err);
-t_user		*connectto(pid_t pid);
+/*
+** USERS BEHAVIORS
+*/
+void		user_disconnect(int pid, t_bool err, t_bool retry);
+void		user_kickall(t_bool err);
+t_user		*user_connect(pid_t pid);
 t_user		*getuser(int pid);
+void		foruser(void (f)(t_user *user));
 
+/*
+** INTERNAL
+*/
 uint8_t		net_init(void);
 void		net_loop(void);
+uint32_t	hash(uint8_t *str);
+void		receiving_coroutine(t_user *user);
+void		sending_coroutine(t_user *user);
 
+/*
+** PACKETS BEHAVIORS
+*/
 t_packet	*net_new_packet(t_user *user, t_bool error);
+
 const char	*net_write_string(t_user *user, const char *str);
 uint8_t		net_write_uint32(t_user *user, const uint32_t nbr);
+
 const char	*net_read_string(t_user *user);
 uint32_t	net_read_uint32(t_user *user);
 
 uint8_t		net_send_error(t_user *user, const uint32_t error);
 uint8_t		net_send_packet(t_user *user);
 
+/*
+** HOOKS
+*/
 void		net_hook_loop(t_user *user);
 void		net_user_connected(t_user *user);
 void		net_receive_error(t_user *user, const uint32_t error);

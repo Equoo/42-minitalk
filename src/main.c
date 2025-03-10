@@ -6,18 +6,17 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/05 15:36:32 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:43:40 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minitalk.h"
 #include "ft_error.h"
+#include "minitalk.h"
 #include "packet.h"
-
-#include <unistd.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <ft_printf.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int	main(int argc, char **argv)
 {
@@ -36,6 +35,7 @@ int	main(int argc, char **argv)
 
 void	net_receive_error(t_user *user, const uint32_t error)
 {
+	ft_printf("receive error: %d\n", error);
 	if (error == ERRPACKETS_DIFFER)
 	{
 		net_new_packet(user, FALSE);
@@ -50,7 +50,7 @@ void	net_connection_timeout(void)
 {
 	ft_printf("Connection timeout\n");
 	if (CLIENT)
-		disconnect_all(TRUE);
+		user_kickall(TRUE);
 	else
-		disconnect_all(FALSE);
+		user_kickall(FALSE);
 }
