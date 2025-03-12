@@ -6,12 +6,10 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:56:58 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 17:13:57 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_error.h"
-#include "ft_printf.h"
 #include "packet.h"
 
 #include <errno.h>
@@ -68,11 +66,11 @@ void	net_loop(void)
 	{
 		//ft_printf("_");
 		foruser(&user_coroutine);
-		usleep(25);
+		usleep(10);
 		foruser(&user_sendings);
 		//ft_printf("-");
 		int i = 0;
-		while (errno != EINTR && i < 100)
+		while (errno != EINTR && i < 1000)
 		{
 			errno = 0;
 			if (foruser(&check_sigreceived))
@@ -80,7 +78,7 @@ void	net_loop(void)
 				errno = EINTR;
 				break ;
 			}
-			usleep(10000);
+			usleep(1000);
 			//ft_printf("+");
 			i++;
 		}

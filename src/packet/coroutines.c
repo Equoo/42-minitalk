@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:54:56 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 17:03:55 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	receiving_coroutine(t_user *user)
 		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
 	}
-	ft_printf("%f| Packet from %d: %s\n", get_time(), user->pid, packet->data + sizeof(uint32_t));
+	//ft_printf("%f| Packet from %d: %s\n", get_time(), user->pid, packet->data + sizeof(uint32_t));
 	user->state = USER_CONNECTED;
 	if (packet->error)
 		net_receive_error(user, packet->hash);

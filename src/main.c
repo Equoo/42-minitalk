@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:54:13 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 16:58:40 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	net_receive_error(t_user *user, const uint32_t error)
 
 void	net_connection_timeout(void)
 {
-	ft_printf("%f| Connection timeout\n", get_time());
+	//ft_printf("%f| Connection timeout\n", get_time());
 	if (CLIENT)
 		user_kickall(TRUE);
 	else
