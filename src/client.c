@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/10 18:43:42 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 11:32:10 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,11 @@ int	init_client(char **argv)
 
 void	net_user_connected(t_user *user)
 {
-	printf("Connected to %d, %s\n", user->pid, user->msg);
+	printf("%f| Connected to %d, %s\n", get_time(), user->pid, user->msg);
 	if (!user->msg)
 	{
 		user_disconnect(user->pid, TRUE, FALSE);
-		return ;
+		exit(EXIT_SUCCESS);
 	}
 	net_new_packet(user, FALSE);
 	net_write_uint32(user, (uint32_t)ft_strlen(user->msg));
@@ -61,7 +61,7 @@ void	net_hook_loop(t_user *user)
 		return ;
 	if (user->state == USER_NONE)
 	{
-		printf("Send next %d\n", user->pid);
+		printf("%f| Send next %d\n", get_time(), user->pid);
 		net_new_packet(user, FALSE);
 		user->msg = (char *)net_write_string(user, user->msg);
 		net_send_packet(user);
@@ -75,7 +75,7 @@ void	net_hook_loop(t_user *user)
 
 void	net_receive_packet(t_user *user, const uint8_t *data)
 {
-	printf("Receive packet %d, %s\n", user->pid, data);
+	printf("%f| Receive packet %d, %s\n", get_time(),  user->pid, data);
 	(void)data;
 	user_disconnect(user->pid, FALSE, FALSE);
 }

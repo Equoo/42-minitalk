@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/10 18:21:30 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 13:46:11 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 typedef enum e_user_state {
 	USER_NONE,
 	USER_CONNECTING,
+	USER_CONNECTION_PENDING,
 	USER_CONNECTED,
 	USER_RECEIVING,
 	USER_WRITING,
@@ -49,6 +50,7 @@ typedef struct s_user
 	pid_t			pid;
 	int8_t			bit;
 	int8_t			sbit;
+	t_bool			pending;
 	t_user_state	state;
 	t_packet		lastpacket;
 	t_packet		packet;

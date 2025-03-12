@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/10 18:43:40 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 11:33:28 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(int argc, char **argv)
 
 void	net_receive_error(t_user *user, const uint32_t error)
 {
-	ft_printf("receive error: %d\n", error);
+	ft_printf("%f| receive error: %d\n", get_time(), error);
 	if (error == ERRPACKETS_DIFFER)
 	{
 		net_new_packet(user, FALSE);
@@ -43,12 +43,12 @@ void	net_receive_error(t_user *user, const uint32_t error)
 		net_send_packet(user);
 	}
 	else if (error == ERRPACKETS_TIMEOUT)
-		ft_printf("Packet from %d timed out, retry...\n", user->pid);
+		ft_printf("%|f Packet from %d timed out, retry...\n", get_time(), user->pid);
 }
 
 void	net_connection_timeout(void)
 {
-	ft_printf("Connection timeout\n");
+	ft_printf("%f| Connection timeout\n", get_time());
 	if (CLIENT)
 		user_kickall(TRUE);
 	else

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/10 18:43:36 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 11:32:40 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	init_server(void)
 void	net_user_connected(t_user *user)
 {
 	(void)user;
-	ft_printf("User connected, %d\n", user->pid);
+	ft_printf("%f| User connected, %d\n", get_time(), user->pid);
 }
 
 void	net_hook_loop(t_user *user)
@@ -56,7 +56,7 @@ void	net_receive_packet(t_user *user, const uint8_t *data)
 		ft_memcpy(user->msg + curlen, str, ft_strlen(str));
 	if (curlen + strlen == user->len)
 	{
-		ft_printf("Message from %d: %s\n", user->pid, user->msg);
+		ft_printf("%f| Message from %d: %s\n", get_time(), user->pid, user->msg);
 		free(user->msg);
 		user->msg = NULL;
 		user_disconnect(user->pid, FALSE, FALSE);

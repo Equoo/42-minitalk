@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/10 18:14:30 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 13:47:10 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void	user_disconnect(pid_t pid, t_bool err, t_bool retry)
 	while (i < USERS_MAX && g_users[i].pid != pid)
 		i++;
 	if (i == USERS_MAX)
+		return ;
+	if (g_users[i].state < USER_CONNECTED || g_users[i].pending)
 		return ;
 	if (g_users[i].msg && g_users[i].len)
 		free(g_users[i].msg);
@@ -102,8 +104,10 @@ t_user	*getuser(int pid)
 			i++;
 		if (i == USERS_MAX)
 			return (NULL);
-		g_users[i] = (t_user){};
+		g_users[i] = (t_user){0};
 		g_users[i].pid = pid;
+		g_users[i].bit = -1;
+		g_users[i].sbit = -1;
 	}
 	return (&g_users[i]);
 }

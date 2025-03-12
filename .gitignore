@@ -60,3 +60,13 @@ dkms.conf
 
 server
 client
+
+#**/*
+#*
+#!*.c
+#!**/*.c
+#!*.h
+#!**/*.h
+#!**/Makefile
+#!.gitignore
+#!.gitmodules

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 13:54:37 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/05 13:19:19 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 11:29:06 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 # define ERRPACKETS "Packet processing"
 # define ERRPACKETS_DIFFER 2000
 # define ERRPACKETS_TIMEOUT 2001
+
+double	get_time(void);
 
 int	print_error(char *category);
 int	print_cerror(char *category, int error);

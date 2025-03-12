@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/06 23:58:57 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/05 14:11:52 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 11:30:02 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,17 @@
 #include <ft_printf.h>
 
 #include "ft_error.h"
+
+#include <stdlib.h>
+#include <sys/time.h>
+
+double get_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec + tv.tv_usec / 1000000.0);
+}
 
 static char	*str_custom_errors(int err)
 {
