@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 13:46:11 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 16:12:34 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void		user_disconnect(int pid, t_bool err, t_bool retry);
 void		user_kickall(t_bool err);
 t_user		*user_connect(pid_t pid);
 t_user		*getuser(int pid);
-void		foruser(void (f)(t_user *user));
+int			foruser(int (f)(t_user *user));
 
 /*
 ** INTERNAL

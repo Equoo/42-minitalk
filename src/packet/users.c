@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 13:47:10 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 16:55:29 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,15 +113,18 @@ t_user	*getuser(int pid)
 }
 
 
-void	foruser(void (f)(t_user *user))
+int	foruser(int (f)(t_user *user))
 {
 	int	i;
+	int	res;
 
 	i = 0;
+	res = 0;
 	while (i < USERS_MAX)
 	{
-		if (g_users[i].state >= USER_CONNECTED)
-			f(&g_users[i]);
+		if (g_users[i].state >= USER_CONNECTED && f(&g_users[i]))
+			res = 1;
 		i++;
 	}
+	return (res);
 }

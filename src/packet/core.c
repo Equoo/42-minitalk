@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 15:31:02 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 16:56:58 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,11 @@
 #include <signal.h>
 #include <unistd.h>
 
-void	user_coroutine(t_user *user)
+int	user_coroutine(t_user *user)
 {
-	ft_printf("\\");
 	if (user->bit <= -1)
-		return ;
-	ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
+		return (0);
+	//ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
 	if (user->state == USER_WRITING)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
@@ -36,41 +35,62 @@ void	user_coroutine(t_user *user)
 		user->state = USER_RECEIVING;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
-		ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
+		//ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
 		user->sbit = 1;
 	}
 	user->bit = -1;
+	return (0);
 }
 
-void	user_sendings(t_user *user)
+int	user_sendings(t_user *user)
 {
 	if (user->sbit <= -1)
-		return ;
-	ft_printf("[%d]\n", user->sbit);
+		return (0);
+	//ft_printf("[%d]\n", user->sbit);
 	if (user->sbit)
 		kill(user->pid, SIGUSR2);
 	else
 		kill(user->pid, SIGUSR1);
 	user->sbit = -1;
+	return (0);
+}
+
+int	check_sigreceived(t_user *user)
+{
+	if (user->bit > -1)
+		return (1);
+	return (0);
 }
 
 void	net_loop(void)
 {
-	elapsed = 0;
 	while (1)
 	{
-		ft_printf("_");
+		//ft_printf("_");
 		foruser(&user_coroutine);
-		usleep(100);
+		usleep(25);
 		foruser(&user_sendings);
-		ft_printf("-");
-		elapsed = sleep(3);
-		if (!elapsed)
+		//ft_printf("-");
+		int i = 0;
+		while (errno != EINTR && i < 100)
+		{
+			errno = 0;
+			if (foruser(&check_sigreceived))
+			{
+				errno = EINTR;
+				break ;
+			}
+			usleep(10000);
+			//ft_printf("+");
+			i++;
+		}
+		if (errno != EINTR)
 		{
 			net_hook_loop(NULL);
 			net_connection_timeout();
 		}
-		ft_printf("%f| Loop, elapsed %d\n", get_time(), elapsed);
+		//ft_printf("%f| Loop, errno %d\n", get_time(), errno);
+		errno = 0;
 	}
 }
 
@@ -85,7 +105,7 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	if (!user)
 		return ;
 	bit = (sig == SIGUSR2);
-	ft_printf("%f| RECEIVE, BIT %d, STATE %d\n", get_time(), bit, user->state);
+	//ft_printf("%f| RECEIVE, BIT %d, STATE %d\n", get_time(), bit, user->state);
 	if (user->pending)
 		user->pending = FALSE;
 	if (user->state < USER_CONNECTED && bit)
@@ -99,7 +119,7 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 		return ;
 	}
 	user->bit = bit;
-	ft_printf("%f| End handler\n", get_time());
+	//ft_printf("%f| End handler\n", get_time());
 }
 
 uint8_t	net_init(void)

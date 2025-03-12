@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 14:13:45 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 16:54:56 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	receiving_coroutine(t_user *user)
 
 	//ft_printf("receiving coroutine, %d, BIT %d\n", user->state, user->bit);
 	packet = &user->packet;
-	ft_printf("Receive data %d, cursor %d\n", user->bit, packet->cursor);
+	//ft_printf("Receive data %d, cursor %d\n", user->bit, packet->cursor);
 	packet->data[packet->cursor / 8] <<= 1;
 	packet->data[packet->cursor / 8] += user->bit;
 	packet->cursor++;
@@ -56,7 +56,7 @@ void	sending_coroutine(t_user *user)
 	uint32_t	pos;
 
 	packet = &user->packet;
-	ft_printf("sending coroutine, HASH %x, CURSOR %d\n", packet->hash, packet->cursor);
+	//ft_printf("sending coroutine, HASH %x, CURSOR %d\n", packet->hash, packet->cursor);
 	if (!packet->hash || !user->bit)
 		return ;
 	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
@@ -71,6 +71,6 @@ void	sending_coroutine(t_user *user)
 	pos = packet->cursor / 8;
 	wbytes = packet->cursor % 8;
 	user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
-	ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
+	//ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
 	packet->cursor++;
 }
