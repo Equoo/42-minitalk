@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 17:03:55 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 18:23:59 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,19 @@ void	receiving_coroutine(t_user *user)
 
 	//ft_printf("receiving coroutine, %d, BIT %d\n", user->state, user->bit);
 	packet = &user->packet;
-	//ft_printf("Receive data %d, cursor %d\n", user->bit, packet->cursor);
+	//if (packet->cursor >= 1040)
+		//ft_printf("Receive data %d, cursor %d\n", user->bit, packet->cursor);
 	packet->data[packet->cursor / 8] <<= 1;
 	packet->data[packet->cursor / 8] += user->bit;
 	packet->cursor++;
 	user->sbit = 1;
-	if ((!packet->error && packet->cursor < PACKET_SIZE + sizeof(uint32_t) * 8 - 1)
-		|| (packet->error && packet->cursor < sizeof(uint32_t) * 8 - 1))
+	if ((!packet->error && packet->cursor < PACKET_SIZE + sizeof(uint32_t) * 8)
+		|| (packet->error && packet->cursor < sizeof(uint32_t) * 8))
 		return ;
 	packet->hash = *(uint32_t *)packet->data;
 	if (!packet->error && packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
+		ft_printf("%x %x %x %x\n", packet->data[128], packet->data[129], packet->data[130], packet->data[131]);
 		ft_printf("%f| Packet from %d failed, retry... (%x, %x) (%u %s)\n", get_time(), user->pid, packet->hash, hash(packet->data + sizeof(uint32_t)), *(uint32_t *)(packet->data + sizeof(uint32_t)), packet->data + sizeof(uint32_t) * 2);
 		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
@@ -62,6 +64,7 @@ void	sending_coroutine(t_user *user)
 	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
 		|| (packet->error && packet->cursor >= sizeof(uint32_t) * 8))
 	{
+		ft_printf("%x %x %x %x\n", packet->data[128], packet->data[129], packet->data[130], packet->data[131]);
 		ft_printf("%f| Sended packet to %d: %x, len %u for %s\n", get_time(), user->pid, packet->hash, ((uint32_t *)packet->data)[1], packet->data + sizeof(uint32_t));
 		user->state = USER_NONE;
 		user->lastpacket = user->packet;
@@ -71,6 +74,7 @@ void	sending_coroutine(t_user *user)
 	pos = packet->cursor / 8;
 	wbytes = packet->cursor % 8;
 	user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
-	//ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
+	//if (packet->cursor >= 1040)
+		//ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
 	packet->cursor++;
 }

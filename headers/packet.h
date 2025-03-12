@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:12:34 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 18:20:06 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ t_packet	*net_new_packet(t_user *user, t_bool error);
 const char	*net_write_string(t_user *user, const char *str);
 uint8_t		net_write_uint32(t_user *user, const uint32_t nbr);
 
-const char	*net_read_string(t_user *user);
+uint8_t		net_read_string(t_user *user, char *dst);
 uint32_t	net_read_uint32(t_user *user);
 
 uint8_t		net_send_error(t_user *user, const uint32_t error);

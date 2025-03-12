@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 11:32:40 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 18:26:49 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,20 @@ void	net_hook_loop(t_user *user)
 
 void	net_receive_packet(t_user *user, const uint8_t *data)
 {
-	char	*str;
-	size_t	strlen;
 	size_t	curlen;
 
+	(void)data;
 	if (!user->msg)
 	{
-		user->len = *(uint32_t *)data;
+		user->len = net_read_uint32(user);
 		user->msg = (char *)ft_calloc(user->len + 1, sizeof(char));
-		str = (char *)data + sizeof(uint32_t);
 	}
-	else
-		str = (char *)data;
-	strlen = ft_strlen(str);
 	curlen = ft_strlen(user->msg);
-	if (curlen + strlen <= user->len)
-		ft_memcpy(user->msg + curlen, str, ft_strlen(str));
-	if (curlen + strlen == user->len)
+	net_read_string(user, user->msg + curlen);
+	curlen = ft_strlen(user->msg);
+	if (curlen >= user->len)
 	{
-		ft_printf("%f| Message from %d: %s\n", get_time(), user->pid, user->msg);
+		ft_printf("%f| Message from %d of len %d: %s\n", get_time(), user->pid, user->len, user->msg);
 		free(user->msg);
 		user->msg = NULL;
 		user_disconnect(user->pid, FALSE, FALSE);

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:30:47 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/06 13:31:32 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/12 18:26:02 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,23 @@ const char	*net_write_string(t_user *user, const char *str)
 		return (NULL);
 	}
 	return (NULL);
+}
+
+uint8_t	net_read_string(t_user *user, char *dst)
+{
+	const size_t	size_left = (PACKET_SIZE - user->packet.cursor + sizeof(uint32_t) * 8) / 8;
+	uint8_t			*data;
+	size_t			len;
+	t_packet		*packet;
+
+	packet = &user->packet;
+	data = packet->data + sizeof(uint32_t) + packet->cursor / 8;
+	len = 0;
+	while (len < size_left && data[len])
+	{
+		dst[len] = data[len];
+		len++;
+	}
+	packet->cursor += 8 * len;
+	return (0);
 }
