@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 17:21:20 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 17:29:34 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 /**
 ** Minitalk 15 000 / seconds MAC
-** Minitalk 15 000 / seconds MAC
+** Minitalk 24 000 / seconds DELL
 */
 
 int	main(int argc, char **argv)
