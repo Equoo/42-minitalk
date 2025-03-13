@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:13:05 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:55:20 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 16:40:26 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ uint8_t	 net_send_packet(t_user *user)
 		packet->hash = hash(packet->data + sizeof(uint32_t));
 		*(uint32_t *)packet->data = packet->hash;
 		packet->cursor = 0;
-		ft_printf("%f| Send packet\n", get_time());
+		//ft_printf("%f| Send packet\n", get_time());
 		kill(user->pid, SIGUSR2);
 	}
 	return (0);

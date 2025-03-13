@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 15:47:40 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 17:09:39 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	user_coroutine(t_user *user)
 	if (user->bit <= -1)
 		return (0);
 	//ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
-	ft_printf("{%d}", user->bit);
+	//ft_printf("{%d}", user->bit);
 	if (user->state == USER_WRITING)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
@@ -35,7 +35,7 @@ int	user_coroutine(t_user *user)
 		user->state = USER_RECEIVING;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
-		ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
+		//ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
 		user->sbit = 1;
 	}
 	net_hook_loop(user);
@@ -47,7 +47,7 @@ int	user_sendings(t_user *user)
 {
 	if (user->sbit <= -1)
 		return (0);
-	ft_printf("[%d]", user->sbit);
+	//ft_printf("[%d]", user->sbit);
 	if (user->sbit)
 		kill(user->pid, SIGUSR2);
 	else
@@ -69,11 +69,11 @@ void	net_loop(void)
 	{
 		//ft_printf("_");
 		foruser(&user_coroutine);
-		usleep(5);
+		//usleep(5);
 		foruser(&user_sendings);
 		//ft_printf("-");
 		int i = 0;
-		while (errno != EINTR && i < 1000)
+		while (errno != EINTR && i < 10000) // 1000
 		{
 			errno = 0;
 			if (foruser(&check_sigreceived))
@@ -81,7 +81,7 @@ void	net_loop(void)
 				errno = EINTR;
 				break ;
 			}
-			usleep(1000);
+			usleep(10); // 1000
 			//ft_printf("+");
 			i++;
 		}

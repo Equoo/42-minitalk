@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:30:47 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 18:26:02 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 16:36:37 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 const char	*net_write_string(t_user *user, const char *str)
 {
-	const size_t	size_left = (PACKET_SIZE - user->packet.cursor + sizeof(uint32_t) * 8) / 8;
+	const size_t	size_left = (PACKET_SIZE - user->packet.cursor) / 8;
 	uint8_t			*data;
 	size_t			len;
 	t_packet		*packet;
@@ -42,7 +42,7 @@ const char	*net_write_string(t_user *user, const char *str)
 
 uint8_t	net_read_string(t_user *user, char *dst)
 {
-	const size_t	size_left = (PACKET_SIZE - user->packet.cursor + sizeof(uint32_t) * 8) / 8;
+	const size_t	size_left = (PACKET_SIZE - user->packet.cursor) / 8;
 	uint8_t			*data;
 	size_t			len;
 	t_packet		*packet;

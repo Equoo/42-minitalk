@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 14:50:44 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 16:36:47 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	net_receive_packet(t_user *user, const uint8_t *data)
 	curlen = ft_strlen(user->msg);
 	net_read_string(user, user->msg + curlen);
 	curlen = ft_strlen(user->msg);
-	ft_printf("%f| Packet from %d of len %d: %s\n", get_time(), user->pid, user->len, user->msg);
+	//ft_printf("%f| Packet from %d of len %d: %s\n", get_time(), user->pid, user->len, user->msg);
 	if (curlen >= user->len)
 	{
 		ft_printf("%f| Message from %d of len %d: %s\n", get_time(), user->pid, user->len, user->msg);

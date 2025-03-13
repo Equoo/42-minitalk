@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:58:40 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 17:21:20 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 #include <ft_printf.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+/**
+** Minitalk 15 000 / seconds MAC
+** Minitalk 15 000 / seconds MAC
+*/
 
 int	main(int argc, char **argv)
 {

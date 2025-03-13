@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 15:05:11 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 17:17:28 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <ft_printf.h>
 #include <libft.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -43,7 +42,7 @@ int	init_client(char **argv)
 
 void	net_user_connected(t_user *user)
 {
-	printf("%f| Connected to %d, %s\n", get_time(), user->pid, user->msg);
+	//printf("%f| Connected to %d, %s\n", get_time(), user->pid, user->msg);
 	if (!user->msg)
 	{
 		user_disconnect(user->pid, TRUE, FALSE);
@@ -59,13 +58,11 @@ void	net_hook_loop(t_user *user)
 {
 	if (!user)
 		return ;
-	if (user->state == USER_CONNECTED)
-		printf("%f| Hook loop %d, %s, %d\n", get_time(), user->pid, user->msg, user->bit);
 	if (!user || !user->msg || !*user->msg || !user->bit)
 		return ;
 	if (user->state == USER_CONNECTED)
 	{
-		printf("%f| Send next %d\n", get_time(), user->pid);
+		//printf("%f| Send next %d\n", get_time(), user->pid);
 		net_new_packet(user, FALSE);
 		user->msg = (char *)net_write_string(user, user->msg);
 		net_send_packet(user);
@@ -79,7 +76,7 @@ void	net_hook_loop(t_user *user)
 
 void	net_receive_packet(t_user *user, const uint8_t *data)
 {
-	printf("%f| Receive packet %d, %s\n", get_time(),  user->pid, data);
+	//printf("%f| Receive packet %d, %s\n", get_time(),  user->pid, data);
 	(void)data;
 	user_disconnect(user->pid, FALSE, FALSE);
 }
