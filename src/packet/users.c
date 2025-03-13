@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:55:29 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:52:37 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,18 +56,19 @@ void	user_disconnect(pid_t pid, t_bool err, t_bool retry)
 	g_users[i] = (t_user){0};
 	if (err)
 	{
-		kill(pid, SIGUSR1);
+		//kill(pid, SIGUSR1);
 		usleep(2500);
-		if (retry)
-			kill(pid, SIGUSR2);
-		else
-			kill(pid, SIGUSR1);
+		//if (retry)
+			//kill(pid, SIGUSR2);
+		//else
+			//kill(pid, SIGUSR1);
 	}
 	else
 	{
-		kill(pid, SIGUSR2);
-		usleep(2500);
-		kill(pid, SIGUSR2);
+		(void)retry;
+		//kill(pid, SIGUSR2);
+		//usleep(2500);
+		//kill(pid, SIGUSR2);
 	}
 }
 

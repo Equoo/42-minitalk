@@ -6,10 +6,12 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 17:13:57 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 15:47:40 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "ft_error.h"
+#include "ft_printf.h"
 #include "packet.h"
 
 #include <errno.h>
@@ -23,19 +25,20 @@ int	user_coroutine(t_user *user)
 	if (user->bit <= -1)
 		return (0);
 	//ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
+	ft_printf("{%d}", user->bit);
 	if (user->state == USER_WRITING)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
 		receiving_coroutine(user);
-	net_hook_loop(user);
-	if (user->state == USER_CONNECTED)
+	else if (user->state == USER_CONNECTED)
 	{
 		user->state = USER_RECEIVING;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
-		//ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
+		ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
 		user->sbit = 1;
 	}
+	net_hook_loop(user);
 	user->bit = -1;
 	return (0);
 }
@@ -44,7 +47,7 @@ int	user_sendings(t_user *user)
 {
 	if (user->sbit <= -1)
 		return (0);
-	//ft_printf("[%d]\n", user->sbit);
+	ft_printf("[%d]", user->sbit);
 	if (user->sbit)
 		kill(user->pid, SIGUSR2);
 	else
@@ -66,7 +69,7 @@ void	net_loop(void)
 	{
 		//ft_printf("_");
 		foruser(&user_coroutine);
-		usleep(10);
+		usleep(5);
 		foruser(&user_sendings);
 		//ft_printf("-");
 		int i = 0;
@@ -120,11 +123,21 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	//ft_printf("%f| End handler\n", get_time());
 }
 
+void net_quit(int sig)
+{
+	(void)sig;
+	user_kickall(FALSE);
+	exit(EXIT_SUCCESS);
+}
+
 uint8_t	net_init(void)
 {
 	struct sigaction	act;
 	sigset_t			sigset;
 
+	signal(SIGQUIT, net_quit);
+	signal(SIGINT, net_quit);
+	errno = 0;
 	act = (struct sigaction){0};
 	sigemptyset(&sigset);
 	sigaddset(&sigset, SIGUSR1);

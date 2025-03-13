@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 18:23:59 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 14:54:50 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	receiving_coroutine(t_user *user)
 	packet->hash = *(uint32_t *)packet->data;
 	if (!packet->error && packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
-		ft_printf("%x %x %x %x\n", packet->data[128], packet->data[129], packet->data[130], packet->data[131]);
 		ft_printf("%f| Packet from %d failed, retry... (%x, %x) (%u %s)\n", get_time(), user->pid, packet->hash, hash(packet->data + sizeof(uint32_t)), *(uint32_t *)(packet->data + sizeof(uint32_t)), packet->data + sizeof(uint32_t) * 2);
 		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
@@ -45,6 +44,7 @@ void	receiving_coroutine(t_user *user)
 		net_receive_error(user, packet->hash);
 	else
 	{
+		packet->cursor = 0;
 		net_receive_packet(user, packet->data + sizeof(uint32_t));
 		user->lastpacket = *packet;
 	}
@@ -64,9 +64,8 @@ void	sending_coroutine(t_user *user)
 	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
 		|| (packet->error && packet->cursor >= sizeof(uint32_t) * 8))
 	{
-		ft_printf("%x %x %x %x\n", packet->data[128], packet->data[129], packet->data[130], packet->data[131]);
-		ft_printf("%f| Sended packet to %d: %x, len %u for %s\n", get_time(), user->pid, packet->hash, ((uint32_t *)packet->data)[1], packet->data + sizeof(uint32_t));
-		user->state = USER_NONE;
+		ft_printf("%f| Sended packet %d to %d: %x, len %u for %s\n", get_time(), packet->cursor, user->pid, packet->hash, ((uint32_t *)packet->data)[1], packet->data + sizeof(uint32_t));
+		user->state = USER_CONNECTED;
 		user->lastpacket = user->packet;
 		user->packet = (t_packet){0};
 		return ;

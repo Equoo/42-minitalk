@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 16:59:00 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/13 15:05:11 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,13 @@ void	net_user_connected(t_user *user)
 
 void	net_hook_loop(t_user *user)
 {
-	if (!user || !user->msg || !*user->msg)
+	if (!user)
 		return ;
-	if (user->state == USER_NONE)
+	if (user->state == USER_CONNECTED)
+		printf("%f| Hook loop %d, %s, %d\n", get_time(), user->pid, user->msg, user->bit);
+	if (!user || !user->msg || !*user->msg || !user->bit)
+		return ;
+	if (user->state == USER_CONNECTED)
 	{
 		printf("%f| Send next %d\n", get_time(), user->pid);
 		net_new_packet(user, FALSE);
