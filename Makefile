@@ -55,6 +55,9 @@ clean_cmd:
 	@clear
 
 # Targets
+.PHONY: bonus
+bonus: all
+
 .PHONY: all
 all: clean_cmd check_git_submodules banner libft check_build
 	@$(MAKE) -j$(shell nproc) --no-print-directory EXTRAFLAGS="$(EXTRAFLAGS)" NAME=$(SERVER) $(SERVER)

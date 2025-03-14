@@ -6,13 +6,14 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 17:29:34 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/14 15:57:51 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_error.h"
 #include "minitalk.h"
 #include "packet.h"
+
 #include <errno.h>
 #include <ft_printf.h>
 #include <stdlib.h>
@@ -40,15 +41,21 @@ int	main(int argc, char **argv)
 
 void	net_receive_error(t_user *user, const uint32_t error)
 {
-	ft_printf("%f| receive error: %d\n", get_time(), error);
+	ft_printf("%f| receive error: %u\n", get_time(), error);
 	if (error == ERRPACKETS_DIFFER)
 	{
-		net_new_packet(user, FALSE);
 		user->packet = user->lastpacket;
+		user->packet.cursor = 0;
 		net_send_packet(user);
+		//kill(user->pid, SIGUSR2);
+		//usleep(250);
+		//kill(user->pid, SIGUSR2);
+		//usleep(250);
+		//user->sbit = -1;
+		ft_printf("%f| Send the last packet, %d, %x, %s, %s, %d\n", get_time(), user->sbit, user->packet.hash, user->packet.data, user->packet.data + sizeof(uint32_t), user->packet.error);
 	}
 	else if (error == ERRPACKETS_TIMEOUT)
-		ft_printf("%|f Packet from %d timed out, retry...\n", get_time(), user->pid);
+		ft_printf("%f| Packet from %d timed out, retry...\n", get_time(), user->pid);
 }
 
 void	net_connection_timeout(void)

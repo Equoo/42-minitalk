@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 17:09:39 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/14 13:51:21 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,17 @@ int	user_coroutine(t_user *user)
 	if (user->bit <= -1)
 		return (0);
 	//ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
-	//ft_printf("{%d}", user->bit);
-	if (user->state == USER_WRITING)
+	//ft_printf("{%d}", user->state);
+	if (user->state == USER_WRITING && user->bit)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
 		receiving_coroutine(user);
-	else if (user->state == USER_CONNECTED)
+	else if (user->state == USER_CONNECTED || !user->bit)
 	{
 		user->state = USER_RECEIVING;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
-		//ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
+		ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
 		user->sbit = 1;
 	}
 	net_hook_loop(user);

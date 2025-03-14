@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 16:40:14 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/14 15:22:43 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void	receiving_coroutine(t_user *user)
 	if (!packet->error && packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
 		ft_printf("%f| Packet from %d failed, retry... (%x, %x) (%u %s)\n", get_time(), user->pid, packet->hash, hash(packet->data + sizeof(uint32_t)), *(uint32_t *)(packet->data + sizeof(uint32_t)), packet->data + sizeof(uint32_t) * 2);
+		user->sbit = -1;
 		net_send_error(user, ERRPACKETS_DIFFER);
 		return ;
 	}
@@ -47,8 +48,8 @@ void	receiving_coroutine(t_user *user)
 		packet->cursor = 0;
 		net_receive_packet(user, packet->data + sizeof(uint32_t));
 		user->lastpacket = *packet;
+		user->packet = (t_packet){0};
 	}
-	user->packet = (t_packet){0};
 }
 
 void	sending_coroutine(t_user *user)
@@ -59,7 +60,7 @@ void	sending_coroutine(t_user *user)
 
 	packet = &user->packet;
 	//ft_printf("sending coroutine, HASH %x, CURSOR %d\n", packet->hash, packet->cursor);
-	if (!packet->hash || !user->bit)
+	if (!packet->hash)
 		return ;
 	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
 		|| (packet->error && packet->cursor >= sizeof(uint32_t) * 8))
@@ -72,8 +73,14 @@ void	sending_coroutine(t_user *user)
 	}
 	pos = packet->cursor / 8;
 	wbytes = packet->cursor % 8;
-	user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
+
+	static int i = 0;
+	if (i++ == 755) // DEBUG
+		user->sbit = !(((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
+	else
+		user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
+
 	//if (packet->cursor >= 1040)
-		//ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
+	//ft_printf("Sending data %d, cursor %d\n", user->sbit, packet->cursor);
 	packet->cursor++;
 }
