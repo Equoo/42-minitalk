@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 13:54:37 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 11:09:54 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 14:21:03 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,14 @@
 # define ERRUSER "User connection"
 # define ERRUSER_MAX 1100
 # define ERRUSER_TIMEOUT 1101
+# define ERRUSER_SERVER_TIMEOUT 1102
 
 # define ERRPACKETS "Packet processing"
 # define ERRPACKETS_DIFFER 2000
 # define ERRPACKETS_ANORMAL 2001
+
+# define ERRWRITING "Sending coroutine"
+# define ERRRECEIVING "Receiving coroutine"
 
 int	print_error(char *category);
 int	print_cerror(char *category, int error);

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:31:16 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/12 18:19:28 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 14:21:48 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ uint8_t	net_write_uint32(t_user *user, const uint32_t nbr)
 	return (0);
 }
 
-uint32_t net_read_uint32(t_user *user)
+uint32_t	net_read_uint32(t_user *user)
 {
 	uint8_t		*data;
 	t_packet	*packet;

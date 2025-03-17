@@ -25,7 +25,8 @@ LIBS = -L$(LIBFT_DIR) -lft
 SRCS = main.c \
 		packet/packet.c \
 		packet/coroutines.c \
-		packet/core.c \
+		packet/loop.c \
+		packet/init.c \
 		packet/string.c \
 		packet/uint32.c \
 		packet/users.c \

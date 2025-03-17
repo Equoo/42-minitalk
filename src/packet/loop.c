@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 12:26:02 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 15:37:50 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,6 @@ int	user_coroutine(t_user *user)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
 		receiving_coroutine(user);
-	if (errno && user->state == USER_WRITING && print_error("Sending coroutine"))
-		user_kickall(TRUE, TRUE);
-	if (errno && user->state == USER_RECEIVING && print_error("Receiving coroutine"))
-		user_kickall(TRUE, TRUE);
 	else if (user->state == USER_CONNECTED || !user->bit)
 	{
 		user->state = USER_RECEIVING;
@@ -39,9 +35,13 @@ int	user_coroutine(t_user *user)
 		user->packet.error = !user->bit;
 		user->sbit = 1;
 	}
+	if (errno && user->state == USER_WRITING && print_error(ERRWRITING))
+		user_kickall(TRUE, TRUE);
+	if (errno && user->state == USER_RECEIVING && print_error(ERRRECEIVING))
+		user_kickall(TRUE, TRUE);
 	net_hook_loop(user);
-	if (errno)
-		print_error("User coroutine");
+	if (errno && print_error("User coroutine"))
+		user_kickall(TRUE, TRUE);
 	user->bit = -1;
 	return (0);
 }
@@ -90,15 +90,14 @@ void	net_loop(void)
 			usleep(10);
 			i++;
 		}
-		if (errno == EINTR)
-			errno = 0;
 		if (!errno)
 			net_hook_loop(NULL);
 		if (!errno)
 			net_connection_timeout();
+		if (errno == EINTR)
+			errno = 0;
 		if (errno && print_error("Signals processing"))
 			user_kickall(TRUE, TRUE);
-
 	}
 }
 
@@ -119,7 +118,7 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	{
 		usleep(1000);
 		if (user->state != USER_CONNECTING)
-			kill(user->pid, SIGUSR2); // Can throw error
+			kill(user->pid, SIGUSR2);
 		if (errno == ESRCH)
 			return ;
 		user->pending = TRUE;

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:13:05 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/14 15:58:19 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 14:18:03 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ uint8_t	net_send_error(t_user *user, const uint32_t error)
 {
 	t_packet	*packet;
 
-	ft_printf("%f| Send error %d to %d\n", get_time(), error, user->pid);
 	net_new_packet(user, TRUE);
 	packet = &user->packet;
 	user->state = USER_WRITING;
@@ -39,16 +38,14 @@ uint8_t	net_send_error(t_user *user, const uint32_t error)
 	return (0);
 }
 
-uint8_t	 net_send_packet(t_user *user)
+uint8_t	net_send_packet(t_user *user)
 {
 	t_packet	*packet;
 
-	//ft_printf("%f| Send packet\n", get_time());
 	packet = &user->packet;
 	user->state = USER_WRITING;
 	packet->hash = hash(packet->data + sizeof(uint32_t));
 	*(uint32_t *)packet->data = packet->hash;
-	ft_print_memory(user->packet.data + 4, PACKET_SIZE / 8);
 	packet->cursor = 0;
 	kill(user->pid, SIGUSR2);
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 12:40:50 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 16:01:30 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ void	net_hook_connect(t_user *user)
 	net_write_uint32(user, (uint32_t)ft_strlen(user->msg));
 	user->msg = (char *)net_write_string(user, user->msg);
 	net_send_packet(user);
+	if (errno == ESRCH && print_cerror(ERRUSER, ERRUSER_SERVER_TIMEOUT))
+		user_kickall(TRUE, TRUE);
 }
 
 void	net_hook_loop(t_user *user)
@@ -64,6 +66,8 @@ void	net_hook_loop(t_user *user)
 	net_new_packet(user, FALSE);
 	user->msg = (char *)net_write_string(user, user->msg);
 	net_send_packet(user);
+	if (errno == ESRCH && print_cerror(ERRUSER, ERRUSER_SERVER_TIMEOUT))
+		user_kickall(TRUE, TRUE);
 }
 
 void	net_hook_received(__attribute__((unused)) t_user *user)

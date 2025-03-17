@@ -6,14 +6,14 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 10:41:27 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 14:17:32 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_bool.h"
 #include "ft_error.h"
 #include "packet.h"
 
+#include <ft_bool.h>
 #include <ft_printf.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -96,7 +96,6 @@ t_user	*getuser(int pid)
 	}
 	return (&g_users[i]);
 }
-
 
 int	foruser(int (f)(t_user *user))
 {

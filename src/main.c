@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 11:08:58 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 16:23:29 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 #include <unistd.h>
 
 /**
-** Minitalk 15 000 / seconds MAC
-** Minitalk 24 000 / seconds DELL
+** Minitalk 15 000 / seconds = 15 ko/s MAC
+** Minitalk 24 000 / seconds = 24 ko/s DELL
 */
 
 int	main(int argc, char **argv)
