@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:18:56 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 16:23:29 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 16:50:58 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	net_receive_error(t_user *user, const uint32_t error)
 		user->packet = user->lastpacket;
 		user->packet.cursor = 0;
 		net_send_packet(user);
+		usleep(1000);
 	}
 	else
 	{

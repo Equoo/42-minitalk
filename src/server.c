@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 15:55:44 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 17:08:58 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ void	net_hook_received(t_user *user)
 		ft_printf("%s\n", user->msg);
 		free(user->msg);
 		user->msg = NULL;
-		//user_disconnect(user->pid);
 	}
 }
 

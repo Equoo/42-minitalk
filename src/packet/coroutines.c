@@ -6,10 +6,11 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 16:02:32 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 17:07:59 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft.h"
 #include "packet.h"
 #include "ft_error.h"
 
@@ -20,6 +21,8 @@
 static void	reception_coroutine(t_user *user, t_packet *packet)
 {
 	packet->hash = *(uint32_t *)packet->data;
+	if (DEBUG)
+		ft_print_memory(packet->data, PACKET_SIZE / 8 + 4);
 	if (!packet->error && packet->hash != hash(packet->data + sizeof(uint32_t)))
 	{
 		user->sbit = -1;
@@ -67,6 +70,8 @@ void	sending_coroutine(t_user *user)
 	if ((!packet->error && packet->cursor >= PACKET_SIZE + sizeof(uint32_t) * 8)
 		|| (packet->error && packet->cursor >= sizeof(uint32_t) * 8))
 	{
+		if (DEBUG)
+			ft_print_memory(packet->data, PACKET_SIZE / 8 + 4);
 		user->state = USER_CONNECTED;
 		user->lastpacket = user->packet;
 		user->packet = (t_packet){0};

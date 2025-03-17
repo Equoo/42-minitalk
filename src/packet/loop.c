@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 15:37:50 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 17:06:41 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ int	user_coroutine(t_user *user)
 	else if (user->state == USER_CONNECTED || !user->bit)
 	{
 		user->state = USER_RECEIVING;
+		if (!user->bit)
+			user->lastpacket = user->packet;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
 		user->sbit = 1;
