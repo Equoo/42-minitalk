@@ -6,15 +6,17 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 17:17:28 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 12:40:50 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_error.h"
 #include "minitalk.h"
 #include "packet.h"
+
 #include <ft_printf.h>
 #include <libft.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -27,25 +29,25 @@ int	init_client(char **argv)
 
 	pid = ft_atoi(argv[1]);
 	if (pid < 1)
-		return (print_cerror("Usage", ERRINITUSAGE));
+		return (print_cerror(ERRUSAGE, ERRINITUSAGE));
 	if (ft_strlen(argv[2]) > MSG_MAX)
-		return (print_cerror("Message", ERRINITLEN));
-	ft_printf("Client PID: %d\n", getpid());
+		return (print_cerror(ERRMESS, ERRINITLEN));
+	if (DEBUG)
+		ft_printf("Client PID: %d\n", getpid());
 	server = user_connect(pid);
-	if (!server)
-		return (print_cerror("Initialization", ERRINITPID));
+	if (!server || errno)
+		return (print_error(ERRUSER));
 	server->msg = argv[2];
 	return (EXIT_SUCCESS);
 }
 
 #if CLIENT
 
-void	net_user_connected(t_user *user)
+void	net_hook_connect(t_user *user)
 {
-	//printf("%f| Connected to %d, %s\n", get_time(), user->pid, user->msg);
 	if (!user->msg)
 	{
-		user_disconnect(user->pid, TRUE, FALSE);
+		user_disconnect(user->pid);
 		exit(EXIT_SUCCESS);
 	}
 	net_new_packet(user, FALSE);
@@ -56,29 +58,26 @@ void	net_user_connected(t_user *user)
 
 void	net_hook_loop(t_user *user)
 {
-	if (!user)
+	if (!user || !user->msg || !*user->msg || !user->bit
+		|| user->state != USER_CONNECTED)
 		return ;
-	if (!user || !user->msg || !*user->msg || !user->bit)
-		return ;
-	if (user->state == USER_CONNECTED)
-	{
-		//printf("%f| Send next %d\n", get_time(), user->pid);
-		net_new_packet(user, FALSE);
-		user->msg = (char *)net_write_string(user, user->msg);
-		net_send_packet(user);
-	}
-	// else
-	//{
-	// disconnect_all(FALSE);
-	// exit(EXIT_SUCCESS);
-	//}
+	net_new_packet(user, FALSE);
+	user->msg = (char *)net_write_string(user, user->msg);
+	net_send_packet(user);
 }
 
-void	net_receive_packet(t_user *user, const uint8_t *data)
+void	net_hook_received(__attribute__((unused)) t_user *user)
 {
-	//printf("%f| Receive packet %d, %s\n", get_time(),  user->pid, data);
-	(void)data;
-	user_disconnect(user->pid, FALSE, FALSE);
+	print_cerror(ERRPACKETS, ERRPACKETS_ANORMAL);
+}
+
+void	net_hook_sended(t_user *user)
+{
+	if (!user->msg)
+	{
+		user_disconnect(user->pid);
+		exit(EXIT_SUCCESS);
+	}
 }
 
 #endif

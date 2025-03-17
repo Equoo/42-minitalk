@@ -1,44 +1,47 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   core.c                                             :+:      :+:    :+:   */
+/*   loop.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 15:29:26 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/14 13:51:21 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 12:26:02 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "ft_bool.h"
 #include "ft_error.h"
-#include "ft_printf.h"
 #include "packet.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <unistd.h>
 
 int	user_coroutine(t_user *user)
 {
 	if (user->bit <= -1)
 		return (0);
-	//ft_printf("%f| Coroutine, BIT %d, STATE %d\n", get_time(), user->bit,  user->state);
-	//ft_printf("{%d}", user->state);
 	if (user->state == USER_WRITING && user->bit)
 		sending_coroutine(user);
 	else if (user->state == USER_RECEIVING)
 		receiving_coroutine(user);
+	if (errno && user->state == USER_WRITING && print_error("Sending coroutine"))
+		user_kickall(TRUE, TRUE);
+	if (errno && user->state == USER_RECEIVING && print_error("Receiving coroutine"))
+		user_kickall(TRUE, TRUE);
 	else if (user->state == USER_CONNECTED || !user->bit)
 	{
 		user->state = USER_RECEIVING;
 		user->packet = (t_packet){0};
 		user->packet.error = !user->bit;
-		ft_printf("%f| New packet, error %d\n", get_time(), user->packet.error);
 		user->sbit = 1;
 	}
 	net_hook_loop(user);
+	if (errno)
+		print_error("User coroutine");
 	user->bit = -1;
 	return (0);
 }
@@ -47,11 +50,15 @@ int	user_sendings(t_user *user)
 {
 	if (user->sbit <= -1)
 		return (0);
-	//ft_printf("[%d]", user->sbit);
 	if (user->sbit)
 		kill(user->pid, SIGUSR2);
 	else
 		kill(user->pid, SIGUSR1);
+	if (errno == ESRCH)
+	{
+		user_disconnect(user->pid);
+		errno = 0;
+	}
 	user->sbit = -1;
 	return (0);
 }
@@ -59,39 +66,39 @@ int	user_sendings(t_user *user)
 int	check_sigreceived(t_user *user)
 {
 	if (user->bit > -1)
+	{
+		errno = EINTR;
 		return (1);
+	}
 	return (0);
 }
 
 void	net_loop(void)
 {
+	int	i;
+
 	while (1)
 	{
-		//ft_printf("_");
 		foruser(&user_coroutine);
-		//usleep(5);
 		foruser(&user_sendings);
-		//ft_printf("-");
-		int i = 0;
-		while (errno != EINTR && i < 10000) // 1000
+		i = 0;
+		while (!errno && i < 10000)
 		{
 			errno = 0;
 			if (foruser(&check_sigreceived))
-			{
-				errno = EINTR;
 				break ;
-			}
-			usleep(10); // 1000
-			//ft_printf("+");
+			usleep(10);
 			i++;
 		}
-		if (errno != EINTR)
-		{
+		if (errno == EINTR)
+			errno = 0;
+		if (!errno)
 			net_hook_loop(NULL);
+		if (!errno)
 			net_connection_timeout();
-		}
-		//ft_printf("%f| Loop, errno %d\n", get_time(), errno);
-		errno = 0;
+		if (errno && print_error("Signals processing"))
+			user_kickall(TRUE, TRUE);
+
 	}
 }
 
@@ -106,48 +113,19 @@ void	packet_sig_handler(int sig, siginfo_t *info, void *context)
 	if (!user)
 		return ;
 	bit = (sig == SIGUSR2);
-	//ft_printf("%f| RECEIVE, BIT %d, STATE %d\n", get_time(), bit, user->state);
 	if (user->pending)
 		user->pending = FALSE;
 	if (user->state < USER_CONNECTED && bit)
 	{
-		usleep(500);
+		usleep(1000);
 		if (user->state != USER_CONNECTING)
 			kill(user->pid, SIGUSR2); // Can throw error
+		if (errno == ESRCH)
+			return ;
 		user->pending = TRUE;
 		user->state = USER_CONNECTED;
-		net_user_connected(user);
+		net_hook_connect(user);
 		return ;
 	}
 	user->bit = bit;
-	//ft_printf("%f| End handler\n", get_time());
-}
-
-void net_quit(int sig)
-{
-	(void)sig;
-	user_kickall(FALSE);
-	exit(EXIT_SUCCESS);
-}
-
-uint8_t	net_init(void)
-{
-	struct sigaction	act;
-	sigset_t			sigset;
-
-	signal(SIGQUIT, net_quit);
-	signal(SIGINT, net_quit);
-	errno = 0;
-	act = (struct sigaction){0};
-	sigemptyset(&sigset);
-	sigaddset(&sigset, SIGUSR1);
-	sigaddset(&sigset, SIGUSR2);
-	act.sa_sigaction = packet_sig_handler;
-	act.sa_flags = SA_SIGINFO;
-	act.sa_mask = sigset;
-	if (sigaction(SIGUSR1, &act, NULL))
-		return (errno);
-	if (sigaction(SIGUSR2, &act, NULL))
-		return (errno);
-	return (0);
 }

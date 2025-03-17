@@ -17,7 +17,7 @@ LIBFT_DIR = libft/
 LIBFT_LIB = libft/libft.a
 
 # Compiler and linker flags
-EXTRAFLAGS = -O3
+EXTRAFLAGS = -O3 -DDEBUG=0
 CFLAGS = -Wall -Wextra -Werror -MMD -D $(shell echo "$(NAME)" | tr '[:lower:]' '[:upper:]')=1 -I $(INC_DIR) -I $(LIBFT_DIR)headers
 LIBS = -L$(LIBFT_DIR) -lft
 
@@ -86,12 +86,12 @@ check_build:
 
 .PHONY: debug
 debug: EXTRAFLAGS = -O0 -g3 -DDEBUG=1
+debug: LIBFTTARGET = debug
 debug: DEBUG = 1
 debug: all
 	touch .d
 
 .PHONY: bonus
-bonus: SRCS = $(SRCS_BONUS)
 bonus: BONUS = 1
 bonus: all
 	touch .b

@@ -6,10 +6,11 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 14:38:41 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/13 14:52:37 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 10:41:27 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "ft_bool.h"
 #include "ft_error.h"
 #include "packet.h"
 
@@ -32,7 +33,8 @@ t_user	*user_connect(pid_t pid)
 	}
 	if (user->state >= USER_CONNECTED)
 	{
-		ft_printf("User %d already connected\n", pid);
+		if (DEBUG)
+			ft_printf("User %d already connected\n", pid);
 		return (NULL);
 	}
 	user->state = USER_CONNECTING;
@@ -40,7 +42,7 @@ t_user	*user_connect(pid_t pid)
 	return (user);
 }
 
-void	user_disconnect(pid_t pid, t_bool err, t_bool retry)
+void	user_disconnect(pid_t pid)
 {
 	int	i;
 
@@ -54,25 +56,9 @@ void	user_disconnect(pid_t pid, t_bool err, t_bool retry)
 	if (g_users[i].msg && g_users[i].len)
 		free(g_users[i].msg);
 	g_users[i] = (t_user){0};
-	if (err)
-	{
-		//kill(pid, SIGUSR1);
-		usleep(2500);
-		//if (retry)
-			//kill(pid, SIGUSR2);
-		//else
-			//kill(pid, SIGUSR1);
-	}
-	else
-	{
-		(void)retry;
-		//kill(pid, SIGUSR2);
-		//usleep(2500);
-		//kill(pid, SIGUSR2);
-	}
 }
 
-void	user_kickall(t_bool err)
+void	user_kickall(t_bool b_exit, t_bool b_err)
 {
 	int	i;
 
@@ -80,13 +66,11 @@ void	user_kickall(t_bool err)
 	while (i < USERS_MAX)
 	{
 		if (g_users[i].state >= USER_CONNECTED)
-			user_disconnect(g_users[i].pid, err, FALSE);
+			user_disconnect(g_users[i].pid);
 		i++;
 	}
-	if (err)
-		exit(EXIT_FAILURE);
-	//else
-		//exit(EXIT_SUCCESS);
+	if (b_exit)
+		exit(b_err);
 }
 
 t_user	*getuser(int pid)

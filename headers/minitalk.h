@@ -6,12 +6,12 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 15:22:25 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/04 15:15:05 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/17 11:11:39 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_H
-# define MAIN_H
+#ifndef MINITALK_H
+# define MINITALK_H
 # include <stdint.h>
 
 # ifndef CLIENT
@@ -38,7 +38,7 @@
 #  define TIMEOUT_TIME 500000
 # endif
 
-int			init_client(char **argv);
-int			init_server(void);
+int	init_client(char **argv);
+int	init_server(void);
 
 #endif
