@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 15:52:58 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 16:47:09 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/18 13:58:42 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ void	net_hook_loop(t_user *user)
 	if (!user || !user->msg || !*user->msg || !user->bit
 		|| user->state != USER_CONNECTED)
 		return ;
+	usleep(500);
 	net_new_packet(user, FALSE);
 	user->msg = (char *)net_write_string(user, user->msg);
 	net_send_packet(user);

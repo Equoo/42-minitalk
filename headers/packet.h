@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 17:28:18 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 12:40:50 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/18 11:33:10 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <stdint.h>
 
 # ifndef USERS_MAX
-#  define USERS_MAX 16
+#  define USERS_MAX 4
 # endif
 
 /*

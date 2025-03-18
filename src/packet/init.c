@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 11:45:31 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 11:50:15 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/18 11:32:29 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 
 void	net_quit(__attribute__((unused)) int sig)
 {
-	user_kickall(TRUE, FALSE);
-	exit(EXIT_FAILURE);
+	user_kickall(FALSE, FALSE);
+	exit(EOWNERDEAD);
 }
 
 uint8_t	net_init(void)

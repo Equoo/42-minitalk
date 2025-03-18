@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 17:58:04 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/17 17:07:59 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/18 11:39:51 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,6 @@ void	sending_coroutine(t_user *user)
 	}
 	pos = packet->cursor / 8;
 	wbytes = packet->cursor % 8;
-
-	static int i = 0;
-	if (i++ == 755) // DEBUG
-		user->sbit = !(((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
-	else
-		user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
-
+	user->sbit = (((packet->data[pos] << wbytes) & (uint8_t)0x80) > 0);
 	packet->cursor++;
 }
