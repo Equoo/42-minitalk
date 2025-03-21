@@ -6,7 +6,7 @@
 /*   By: dderny <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 15:14:30 by dderny            #+#    #+#             */
-/*   Updated: 2025/03/18 13:54:46 by dderny           ###   ########.fr       */
+/*   Updated: 2025/03/21 15:45:11 by dderny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,8 @@ void	net_hook_received(t_user *user)
 	curlen = ft_strlen(user->msg);
 	if (curlen >= user->len)
 	{
-		ft_printf(user->msg);
-		ft_printf("\n");
+		write(STDOUT_FILENO, user->msg, user->len);
+		write(STDOUT_FILENO, "\n", 1);
 		free(user->msg);
 		user->msg = NULL;
 	}

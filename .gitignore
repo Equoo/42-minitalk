@@ -57,7 +57,8 @@ dkms.conf
 
 # Local files
 .state.tmp
-.debug
+.d
+.b
 .serverpid
 
 server
