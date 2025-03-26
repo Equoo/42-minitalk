@@ -130,6 +130,7 @@ fclean: clean
 	@rm -f $(SERVER) $(CLIENT)
 	@$(ECHO) -e "$(GREEN)[✓] Fully cleaned everything!$(RESET)"
 
+.PHONY: re
 re: fclean all
 
 .PHONY: banner
